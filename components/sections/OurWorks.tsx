@@ -2,45 +2,49 @@
 
 import { useState } from 'react';
 
+
 export default function OurWorks() {
   const works = [
     {
-      title: 'Birthday Memory',
-      caption: 'A celebration turned into a timeless keepsake',
-      category: 'Birthday',
-      video: '/videos/Birthday.mp4'
+      title: "Birthday Memory",
+      caption: "A celebration turned into a timeless keepsake",
+      category: "Birthday",
+      video: "https://evermoment-media.s3.ap-south-1.amazonaws.com/samples/Birthday.mp4"
     },
     {
-      title: 'Anniversary Film',
-      caption: 'Love stories deserve more, So with just images we crafted this video using "AI"',
-      category: 'Anniversary',
-      video: '/videos/Anniversary.mp4'
+      title: "Anniversary Film",
+      caption: "Love stories deserve more, so with just images we crafted this video using AI",
+      category: "Anniversary",
+      video: "https://evermoment-media.s3.ap-south-1.amazonaws.com/samples/Anniversary.mp4"
     },
     {
-      title: 'Travel Story',
-      caption: 'Adventures captured, emotions preserved',
-      category: 'Travel',
-      video: '/videos/Travel.mp4'
+      title: "Travel Story",
+      caption: "Adventures captured, emotions preserved",
+      category: "Travel",
+      video: "https://evermoment-media.s3.ap-south-1.amazonaws.com/samples/Travel.mp4"
     },
     {
-      title: 'Family Moment',
-      caption: 'The laughter and warmth of family, forever',
-      category: 'Family',
-      video: '/videos/Family.mp4'
+      title: "Family Moment",
+      caption: "The laughter and warmth of family, forever",
+      category: "Family",
+      video: "https://evermoment-media.s3.ap-south-1.amazonaws.com/samples/Family.mp4"
     },
     {
-      title: 'Business Story',
-      caption: 'Your professional moments, elevated',
-      category: 'Business',
-      video: '/videos/business.mp4'
+      title: "Business Story",
+      caption: "Your professional moments, elevated",
+      category: "Business",
+      video: "https://evermoment-media.s3.ap-south-1.amazonaws.com/samples/business.mp4"
     },
     {
-      title: 'Special Memory',
-      caption: 'The most special day, beautifully retold',
-      category: 'Special',
-      video: '/videos/Special.mp4'
+      title: "Special Memory",
+      caption: "The most special day, beautifully retold",
+      category: "Special",
+      video: "https://evermoment-media.s3.ap-south-1.amazonaws.com/samples/Special.mp4"
     }
   ];
+
+  // rest of your component stays exactly the same
+
 
   const [activeWork, setActiveWork] = useState<number | null>(null);
 
