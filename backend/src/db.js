@@ -7,17 +7,23 @@ dotenv.config();
    DATABASE CONNECTION
 ========================= */
 
-const DATABASE_URL = process.env.DATABASE_URL;
+// Railway MySQL (single source of truth)
+const MYSQL_URL = process.env.MYSQL_MYSQL_URL;
 
-if (!DATABASE_URL) {
-  console.error("❌ DATABASE_URL not found in environment variables");
+if (!MYSQL_URL) {
+  console.error("❌ MYSQL_MYSQL_URL not found in environment variables");
   process.exit(1);
 }
 
-const pool = mysql.createPool(DATABASE_URL);
+const pool = mysql.createPool({
+  uri: MYSQL_URL,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+});
 
 /* =========================
-   CONNECTION CHECK (SAFE)
+   HEALTH CHECK
 ========================= */
 (async () => {
   try {
@@ -26,6 +32,7 @@ const pool = mysql.createPool(DATABASE_URL);
     conn.release();
   } catch (err) {
     console.error("❌ MySQL connection failed:", err.message);
+    process.exit(1);
   }
 })();
 
