@@ -4,11 +4,14 @@ import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Button from "@/components/Button";
 
-const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
+const API_BASE =
+  process.env.NEXT_PUBLIC_BACKEND_URL ||
+  "https://evermoment-frontend-1.onrender.com";
 
 if (!API_BASE) {
-  throw new Error("NEXT_PUBLIC_BACKEND_URL is not defined");
+  throw new Error("Backend URL not configured");
 }
+
 const PLANS = [
   { id: "story", name: "Story / Status", price: 149, duration: "Up to 1 minute" },
   { id: "basic", name: "Beautiful Moments", price: 399, duration: "Up to 3 minutes" },
