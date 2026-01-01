@@ -397,6 +397,101 @@ function extractS3Key(deliveryUrl) {
 /* =========================
    CREATE ORDER
 ========================= */
+// router.post("/", async (req, res) => {
+//   try {
+//     const {
+//       email,
+//       whatsapp,
+//       momentType,
+//       specialBecause,
+//       plan,
+//       fastTrack = false,
+//     } = req.body;
+
+//     // 🔒 Validation
+//     if (!email || !whatsapp || !momentType || !PLAN_PRICING[plan]) {
+//       return res.status(400).json({
+//         success: false,
+//         error: "Invalid order data",
+//       });
+//     }
+
+//     const baseAmount = PLAN_PRICING[plan];
+
+//     const fastTrackAllowed =
+//       FAST_TRACK_ENABLED && fastTrack === true && plan === "story";
+
+//     const fastTrackAmount = fastTrackAllowed ? FAST_TRACK_PRICE : 0;
+//     const amount = baseAmount + fastTrackAmount;
+
+//     const orderId = randomUUID();
+//     const accessToken = randomBytes(32).toString("hex");
+
+//     await pool.query(
+//       `
+//       INSERT INTO orders (
+//         id,
+//         email,
+//         whatsapp,
+//         moment_type,
+//         special_because,
+//         plan,
+//         fast_track,
+//         base_amount,
+//         fast_track_amount,
+//         amount,
+//         status,
+//         payment_status,
+//         delivery_unlocked,
+//         access_token
+//       )
+//       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'created', 'pending', 0, ?)
+//       `,
+//       [
+//         orderId,
+//         email,
+//         whatsapp,
+//         momentType,
+//         specialBecause || null,
+//         plan,
+//         fastTrackAllowed ? 1 : 0,
+//         baseAmount,
+//         fastTrackAmount,
+//         amount,
+//         accessToken,
+//       ]
+//     );
+
+//     // 📧 Email (NON-BLOCKING – NEVER break response)
+//     sendOrderConfirmationEmail({
+//       email,
+//       orderId,
+//       plan,
+//       fastTrack: fastTrackAllowed,
+//       base_amount: baseAmount,
+//       fast_track_amount: fastTrackAmount,
+//     }).catch((err) =>
+//       console.error("ORDER CONFIRMATION EMAIL FAILED:", err.message)
+//     );
+
+//     // ✅ ALWAYS return JSON
+//     return res.status(201).json({
+//       success: true,
+//       message: "Order created",
+//       orderId,
+//       accessToken,
+//       amount,
+//     });
+//   } catch (err) {
+//     console.error("ORDER CREATE ERROR:", err);
+//     return res.status(500).json({
+//       success: false,
+//       error: "Failed to create order",
+//     });
+//   }
+// });
+
+
 router.post("/", async (req, res) => {
   try {
     const {
@@ -405,47 +500,30 @@ router.post("/", async (req, res) => {
       momentType,
       specialBecause,
       plan,
-      fastTrack = false,
+      fastTrack
     } = req.body;
 
-    // 🔒 Validation
-    if (!email || !whatsapp || !momentType || !PLAN_PRICING[plan]) {
-      return res.status(400).json({
-        success: false,
-        error: "Invalid order data",
-      });
+    if (!email || !whatsapp || !momentType || !plan) {
+      return res.status(400).json({ error: "Missing required fields" });
     }
-
-    const baseAmount = PLAN_PRICING[plan];
-
-    const fastTrackAllowed =
-      FAST_TRACK_ENABLED && fastTrack === true && plan === "story";
-
-    const fastTrackAmount = fastTrackAllowed ? FAST_TRACK_PRICE : 0;
-    const amount = baseAmount + fastTrackAmount;
 
     const orderId = randomUUID();
     const accessToken = randomBytes(32).toString("hex");
 
+    const baseAmount =
+      plan === "story" ? 149 :
+      plan === "basic" ? 399 :
+      799;
+
+    const fastTrackAmount = fastTrack ? 100 : 0;
+    const amount = baseAmount + fastTrackAmount;
+
     await pool.query(
       `
-      INSERT INTO orders (
-        id,
-        email,
-        whatsapp,
-        moment_type,
-        special_because,
-        plan,
-        fast_track,
-        base_amount,
-        fast_track_amount,
-        amount,
-        status,
-        payment_status,
-        delivery_unlocked,
-        access_token
-      )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'created', 'pending', 0, ?)
+      INSERT INTO orders
+      (id, email, whatsapp, moment_type, special_because, plan,
+       fast_track, base_amount, fast_track_amount, amount, access_token)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `,
       [
         orderId,
@@ -454,42 +532,26 @@ router.post("/", async (req, res) => {
         momentType,
         specialBecause || null,
         plan,
-        fastTrackAllowed ? 1 : 0,
+        fastTrack ? 1 : 0,
         baseAmount,
         fastTrackAmount,
         amount,
-        accessToken,
+        accessToken
       ]
     );
 
-    // 📧 Email (NON-BLOCKING – NEVER break response)
-    sendOrderConfirmationEmail({
-      email,
-      orderId,
-      plan,
-      fastTrack: fastTrackAllowed,
-      base_amount: baseAmount,
-      fast_track_amount: fastTrackAmount,
-    }).catch((err) =>
-      console.error("ORDER CONFIRMATION EMAIL FAILED:", err.message)
-    );
-
-    // ✅ ALWAYS return JSON
+    // 🔥 THIS IS CRITICAL
     return res.status(201).json({
-      success: true,
-      message: "Order created",
       orderId,
-      accessToken,
-      amount,
+      accessToken
     });
+
   } catch (err) {
-    console.error("ORDER CREATE ERROR:", err);
-    return res.status(500).json({
-      success: false,
-      error: "Failed to create order",
-    });
+    console.error("CREATE ORDER ERROR:", err);
+    return res.status(500).json({ error: "Failed to create order" });
   }
 });
+
 
 /* =========================
    ACCESS ORDER (CLIENT)
@@ -520,6 +582,17 @@ router.get("/access/:token", async (req, res) => {
     if (!rows.length) {
       return res.status(404).json({ error: "Order not found" });
     }
+    // 📧 Email (NON-BLOCKING – NEVER break response)
+    sendOrderConfirmationEmail({
+      email,
+      orderId,
+      plan,
+      fastTrack: fastTrackAllowed,
+      base_amount: baseAmount,
+      fast_track_amount: fastTrackAmount,
+    }).catch((err) =>
+      console.error("ORDER CONFIRMATION EMAIL FAILED:", err.message)
+    );
 
     return res.json(rows[0]);
   } catch (err) {

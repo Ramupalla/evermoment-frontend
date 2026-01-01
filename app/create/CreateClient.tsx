@@ -8,9 +8,7 @@ const API_BASE =
   process.env.NEXT_PUBLIC_BACKEND_URL ||
   "https://evermoment-frontend-1.onrender.com";
 
-if (!API_BASE) {
-  throw new Error("Backend URL not configured");
-}
+const FAST_TRACK_UI_ENABLED = true;
 
 const PLANS = [
   { id: "story", name: "Story / Status", price: 149, duration: "Up to 1 minute" },
@@ -52,17 +50,24 @@ export default function CreateClient() {
     if (selectedPlan !== "story") setFastTrack(false);
   }, [selectedPlan]);
 
+  /* =====================
+     FILE HANDLING (NO DUPES)
+     ===================== */
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
 
     const incoming = Array.from(e.target.files);
+
     setUploadedFiles(prev => {
-      const keys = new Set(prev.map(f => `${f.file.name}-${f.file.size}`));
+      const existingKeys = new Set(
+        prev.map(f => `${f.file.name}-${f.file.size}-${f.file.lastModified}`)
+      );
+
       const unique: UploadedFile[] = [];
 
       for (const file of incoming) {
-        const key = `${file.name}-${file.size}`;
-        if (!keys.has(key)) {
+        const key = `${file.name}-${file.size}-${file.lastModified}`;
+        if (!existingKeys.has(key)) {
           unique.push({
             file,
             id: crypto.randomUUID(),
@@ -70,10 +75,19 @@ export default function CreateClient() {
           });
         }
       }
+
+      if (unique.length !== incoming.length) {
+        alert("Duplicate files were ignored.");
+      }
+
       return [...prev, ...unique];
     });
 
     e.target.value = "";
+  };
+
+  const removeFile = (id: string) => {
+    setUploadedFiles(prev => prev.filter(f => f.id !== id));
   };
 
   const finalMomentType =
@@ -82,7 +96,7 @@ export default function CreateClient() {
       : formData.momentType;
 
   /* =====================
-     SAFE SUBMIT FLOW
+     SUBMIT
      ===================== */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -108,60 +122,12 @@ export default function CreateClient() {
         }),
       });
 
-      const text = await res.text();
-      const data = text ? JSON.parse(text) : null;
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Order creation failed");
 
-      if (!res.ok || !data?.accessToken || !data?.orderId) {
-        throw new Error(data?.error || "Order creation failed");
-      }
-
-      const { orderId, accessToken } = data;
-
-      /* Upload files */
-      if (uploadedFiles.length) {
-        const uploaded = [];
-
-        for (const f of uploadedFiles) {
-          const presignRes = await fetch(`${API_BASE}/api/uploads/presign`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              orderId,
-              fileName: f.file.name,
-              fileType: f.file.type,
-            }),
-          });
-
-          const presignText = await presignRes.text();
-          const presign = presignText ? JSON.parse(presignText) : null;
-
-          if (!presign?.uploadUrl || !presign?.key) {
-            throw new Error("Upload preparation failed");
-          }
-
-          await fetch(presign.uploadUrl, {
-            method: "PUT",
-            headers: { "Content-Type": f.file.type },
-            body: f.file,
-          });
-
-          uploaded.push({
-            key: presign.key,
-            type: f.type,
-            originalName: f.file.name,
-          });
-        }
-
-        await fetch(`${API_BASE}/api/uploads/complete`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ orderId, files: uploaded }),
-        });
-      }
-
-      router.push(`/order/${accessToken}`);
+      router.push(`/order/${data.accessToken}`);
     } catch (err: any) {
-      alert(err.message || "Something went wrong");
+      alert(err.message);
     } finally {
       setSubmitting(false);
     }
@@ -172,17 +138,24 @@ export default function CreateClient() {
   return (
     <div className="pt-24 pb-20 px-4 bg-soft-white min-h-screen">
       <div className="max-w-3xl mx-auto">
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-xl p-8 space-y-8">
-          <h1 className="text-3xl font-bold text-center">Create Your EverMoment</h1>
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white rounded-2xl shadow-xl p-8 space-y-8"
+        >
+          <h1 className="text-3xl font-bold text-center">
+            Create Your EverMoment
+          </h1>
 
+          {/* PLANS */}
           <div className="grid sm:grid-cols-3 gap-4">
             {PLANS.map(plan => (
               <div
                 key={plan.id}
                 onClick={() => setSelectedPlan(plan.id)}
-                className={`cursor-pointer border-2 rounded-xl p-4 ${
-                  selectedPlan === plan.id ? "border-gold" : "border-gray-200"
-                }`}
+                className={`cursor-pointer rounded-xl border-2 p-4 transition
+                  ${selectedPlan === plan.id
+                    ? "border-gold bg-gold/5"
+                    : "border-gray-200 hover:border-gold"}`}
               >
                 <p className="font-semibold">{plan.name}</p>
                 <p className="text-xl">₹{plan.price}</p>
@@ -191,11 +164,42 @@ export default function CreateClient() {
             ))}
           </div>
 
+          {/* FAST TRACK (REFERENCE IMPLEMENTATION) */}
+          {selectedPlan === "story" && (
+            <div
+              className={`rounded-xl border border-gold/40 bg-gold/5 p-4 transition
+                ${!FAST_TRACK_UI_ENABLED ? "opacity-40 cursor-not-allowed" : ""}`}
+            >
+              <label className="flex gap-3 items-start">
+                <input
+                  type="checkbox"
+                  checked={fastTrack}
+                  disabled={!FAST_TRACK_UI_ENABLED}
+                  onChange={e => setFastTrack(e.target.checked)}
+                  className="mt-1 accent-gold"
+                />
+                <div>
+                  <p className="font-medium">⚡ Fast Track Delivery</p>
+                  <p className="text-xs text-gray-600">
+                    Add on +₹99 priority editing delivered within 12hr
+                  </p>
+                </div>
+              </label>
+            </div>
+          )}
+
+          {/* MOMENT TYPE */}
           <select
             required
             className="w-full border-2 rounded-xl p-3"
             value={formData.momentType}
-            onChange={e => setFormData({ ...formData, momentType: e.target.value })}
+            onChange={e =>
+              setFormData({
+                ...formData,
+                momentType: e.target.value,
+                customMomentType: "",
+              })
+            }
           >
             <option value="">Choose moment type</option>
             <option value="birthday">Birthday</option>
@@ -210,7 +214,7 @@ export default function CreateClient() {
             <input
               required
               className="w-full border-2 rounded-xl p-3"
-              placeholder="Custom moment"
+              placeholder="Please specify your moment"
               value={formData.customMomentType}
               onChange={e =>
                 setFormData({ ...formData, customMomentType: e.target.value })
@@ -218,13 +222,55 @@ export default function CreateClient() {
             />
           )}
 
-          <input
-            type="file"
-            multiple
-            accept="video/*,image/*"
-            onChange={handleFileChange}
-          />
+          {/* UPLOAD BOX */}
+          <div>
+            <label className="block font-semibold mb-3">
+              Upload your videos and photos
+            </label>
 
+            <div className="relative border-2 border-dashed rounded-xl p-8 text-center">
+              <input
+                type="file"
+                multiple
+                accept="video/*,image/*"
+                onChange={handleFileChange}
+                className="absolute inset-0 opacity-0 cursor-pointer"
+              />
+              <p className="font-medium">Click or drag files</p>
+              <p className="text-sm text-gray-500">
+                Duplicate files are ignored automatically
+              </p>
+            </div>
+
+            {uploadedFiles.length > 0 && (
+              <div className="mt-4 space-y-2">
+                {uploadedFiles.map(f => (
+                  <div
+                    key={f.id}
+                    className="flex justify-between items-center border p-3 rounded-lg"
+                  >
+                    <div>
+                      <p className="text-sm font-medium truncate">
+                        {f.file.name}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {(f.file.size / 1024 / 1024).toFixed(2)} MB
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeFile(f.id)}
+                      className="text-red-500"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* STORY */}
           <textarea
             required
             className="w-full border-2 rounded-xl p-3"
@@ -235,13 +281,17 @@ export default function CreateClient() {
             }
           />
 
+          {/* CONTACT */}
           <input
             required
             className="w-full border-2 rounded-xl p-3"
             placeholder="Mobile number"
             value={formData.whatsappNumber}
             onChange={e =>
-              setFormData({ ...formData, whatsappNumber: e.target.value.replace(/\D/g, "") })
+              setFormData({
+                ...formData,
+                whatsappNumber: e.target.value.replace(/\D/g, ""),
+              })
             }
           />
 

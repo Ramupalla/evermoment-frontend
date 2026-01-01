@@ -222,11 +222,13 @@ body::before {
 }
 
 
-Soft section edge fade */
+
+/* Soft section edge fade  */
 .section-fade {
   position: relative;
   overflow: hidden;
 }
+
 
 /* .section-fade::before,
 .section-fade::after {
