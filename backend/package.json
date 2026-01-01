@@ -4,9 +4,11 @@
   "description": "",
   "type": "module",
   "scripts": {
-    "dev": "nodemon index.js",
-    "start": "node index.js"
-  },
+  "dev": "next dev",
+  "build": "next build",
+  "start": "next start"
+},
+
   "keywords": [],
   "author": "",
   "license": "ISC",
