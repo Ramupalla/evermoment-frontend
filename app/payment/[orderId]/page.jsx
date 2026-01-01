@@ -16,6 +16,11 @@ const STEPS = [
 ];
 
 export default function PaymentPage() {
+
+  const API_BASE =
+  process.env.NEXT_PUBLIC_BACKEND_URL ||
+  "https://evermoment-frontend-1.onrender.com";
+
   const { orderId } = useParams();
   const router = useRouter();
 
@@ -24,10 +29,12 @@ export default function PaymentPage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
+
+
   useEffect(() => {
     if (!orderId) return;
 
-    fetch(`http://localhost:5000/api/orders/access/${orderId}`)
+    fetch(`${API_BASE}/api/orders/access/${orderId}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.error) throw new Error(data.error);
@@ -40,7 +47,7 @@ export default function PaymentPage() {
   //   setLoading(true);
 
   //   const res = await fetch(
-  //     "http://localhost:5000/api/payments/create-order",
+  //     "${API_BASE}/api/payments/create-order",
   //     {
   //       method: "POST",
   //       headers: { "Content-Type": "application/json" },
@@ -60,7 +67,7 @@ export default function PaymentPage() {
   //     order_id: data.razorpayOrderId,
 
   //     handler: async (response) => {
-  //       await fetch("http://localhost:5000/api/payments/verify", {
+  //       await fetch("${API_BASE}/api/payments/verify", {
   //         method: "POST",
   //         headers: { "Content-Type": "application/json" },
   //         body: JSON.stringify({
@@ -85,7 +92,7 @@ export default function PaymentPage() {
   setLoading(true);
 
   const res = await fetch(
-    "http://localhost:5000/api/payments/create-order",
+    "${API_BASE}/api/payments/create-order",
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -107,7 +114,7 @@ export default function PaymentPage() {
     handler: async (response) => {
       try {
         const verifyRes = await fetch(
-          "http://localhost:5000/api/payments/verify",
+          "${API_BASE}/api/payments/verify",
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },

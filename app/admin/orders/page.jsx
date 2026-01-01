@@ -3,15 +3,22 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
 
+/* ✅ CENTRALIZED API BASE */
+
+
+
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const API_BASE =
+  process.env.NEXT_PUBLIC_BACKEND_URL ||
+  "https://evermoment-frontend-1.onrender.com";
 
   /* =====================
      FETCH ORDERS
      ===================== */
   const fetchOrders = useCallback(() => {
-    fetch("http://localhost:5000/api/admin/orders", {
+    fetch("${API_BASE}/api/admin/orders", {
       headers: {
         "x-admin-secret": process.env.NEXT_PUBLIC_ADMIN_SECRET,
       },
@@ -115,7 +122,7 @@ function Actions({ order, onActionComplete }) {
 
   const sendPaymentLink = async () => {
     await fetch(
-      `http://localhost:5000/api/admin/orders/${order.id}/send-payment-link`,
+      `${API_BASE}/api/admin/orders/${order.id}/send-payment-link`,
       {
         method: "POST",
         headers: {
@@ -225,7 +232,7 @@ const btn = {
 //      FETCH ORDERS
 //      ===================== */
 //   const fetchOrders = useCallback(() => {
-//     fetch("http://localhost:5000/api/admin/orders", {
+//     fetch("${API_BASE}/api/admin/orders", {
 //       headers: {
 //         "x-admin-secret": process.env.NEXT_PUBLIC_ADMIN_SECRET,
 //       },
@@ -329,7 +336,7 @@ const btn = {
 
 //   const sendPaymentLink = async () => {
 //     await fetch(
-//       `http://localhost:5000/api/admin/orders/${order.id}/send-payment-link`,
+//       `${API_BASE}/api/admin/orders/${order.id}/send-payment-link`,
 //       {
 //         method: "POST",
 //         headers: {

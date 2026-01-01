@@ -4,9 +4,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Button from "@/components/Button";
 
-const API_BASE =
-  process.env.NEXT_PUBLIC_BACKEND_URL ||
-  "https://evermoment-frontend-1.onrender.com";
+
 
 const FAST_TRACK_UI_ENABLED = true;
 
@@ -39,6 +37,10 @@ export default function CreateClient() {
     whatsappNumber: "",
     email: "",
   });
+
+  const API_BASE =
+  process.env.NEXT_PUBLIC_BACKEND_URL ||
+  "https://evermoment-frontend-1.onrender.com";
 
   useEffect(() => {
     if (planFromUrl && PLANS.some(p => p.id === planFromUrl)) {

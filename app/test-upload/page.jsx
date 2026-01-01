@@ -2,6 +2,12 @@
 import { useState } from "react";
 
 export default function TestUploadPage() {
+
+
+const API_BASE =
+  process.env.NEXT_PUBLIC_BACKEND_URL ||
+  "https://evermoment-frontend-1.onrender.com";
+
   const [file, setFile] = useState(null);
 
   // 🔴 IMPORTANT: paste a REAL orderId from your DB
@@ -16,7 +22,7 @@ export default function TestUploadPage() {
     console.log("Selected file:", file.name);
 
     // 1️⃣ Get presigned URL
-    const presignRes = await fetch("http://localhost:5000/api/uploads/presign", {
+    const presignRes = await fetch("${API_BASE}/api/uploads/presign", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -44,7 +50,7 @@ export default function TestUploadPage() {
 
     // 3️⃣ Notify backend upload is complete
     const completeRes = await fetch(
-      "http://localhost:5000/api/uploads/complete",
+      "${API_BASE}/api/uploads/complete",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },

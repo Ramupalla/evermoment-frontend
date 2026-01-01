@@ -515,7 +515,7 @@ router.post("/", async (req, res) => {
       plan === "basic" ? 399 :
       799;
 
-    const fastTrackAmount = fastTrack ? 100 : 0;
+    const fastTrackAmount = fastTrack ? 99 : 0;
     const amount = baseAmount + fastTrackAmount;
 
     await pool.query(

@@ -16,6 +16,10 @@ const STEPS = [
 export default function OrderStatusPage() {
   
 
+const API_BASE =
+  process.env.NEXT_PUBLIC_BACKEND_URL ||
+  "https://evermoment-frontend-1.onrender.com";
+
   const { token } = useParams();
   const router = useRouter();
 
@@ -55,10 +59,11 @@ export default function OrderStatusPage() {
 //     .catch(() => setError("Unable to fetch order status"));
 // }, [token]);
 
+
 useEffect(() => {
   if (!token) return;
 
-  fetch(`http://localhost:5000/api/orders/access/${token}`)
+  fetch(`${API_BASE}/api/orders/access/${token}`)
     .then(async (res) => {
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "Fetch failed");
@@ -108,8 +113,7 @@ const uploadFiles = async () => {
 
     for (const file of selectedFiles) {
       // 1️⃣ Get presigned URL
-      const presignRes = await fetch(
-        "http://localhost:5000/api/uploads/presign",
+      const presignRes = await fetch("${API_BASE}/api/uploads/presign",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -138,7 +142,7 @@ const uploadFiles = async () => {
     }
 
     // 3️⃣ Finalize upload
-    await fetch("http://localhost:5000/api/uploads/complete", {
+    await fetch("${API_BASE}/api/uploads/complete", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -281,7 +285,7 @@ const uploadFiles = async () => {
       {/* ⬇️ DOWNLOAD */}
       {data.delivery_unlocked && (
         <a
-          href={`http://localhost:5000/api/orders/${token}/download`}
+          href={`${API_BASE}/api/orders/${token}/download`}
           style={downloadBtn}
         >
           ⬇️ Download Your EverMoment

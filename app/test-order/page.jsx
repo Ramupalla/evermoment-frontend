@@ -1,8 +1,13 @@
 "use client";
 
 export default function TestOrderPage() {
+  /* ✅ CENTRALIZED API BASE */
+const API_BASE =
+  process.env.NEXT_PUBLIC_BACKEND_URL ||
+  "https://evermoment-frontend-1.onrender.com";
+  
   const createOrder = async () => {
-    const res = await fetch("http://localhost:5000/api/orders", {
+    const res = await fetch("${API_BASE}/api/orders", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

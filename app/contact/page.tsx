@@ -5,6 +5,12 @@ import { useState, FormEvent } from "react";
 
 
 export default function ContactPage() {
+  
+  /* ✅ CENTRALIZED API BASE */
+const API_BASE =
+  process.env.NEXT_PUBLIC_BACKEND_URL ||
+  "https://evermoment-frontend-1.onrender.com";
+
     const [form, setForm] = useState({
     name: "",
     email: "",
@@ -23,7 +29,7 @@ export default function ContactPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:5000/api/contact", {
+      const res = await fetch("${API_BASE}/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),

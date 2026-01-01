@@ -29,7 +29,7 @@
 
 //       // 1️⃣ Presign
 //       const presignRes = await fetch(
-//         "http://localhost:5000/api/uploads/presign",
+//         "${API_BASE}/api/uploads/presign",
 //         {
 //           method: "POST",
 //           headers: { "Content-Type": "application/json" },
@@ -64,7 +64,7 @@
 //     }
 
 //     // 4️⃣ Notify backend
-//     await fetch("http://localhost:5000/api/uploads/complete", {
+//     await fetch("${API_BASE}/api/uploads/complete", {
 //       method: "POST",
 //       headers: { "Content-Type": "application/json" },
 //       body: JSON.stringify({
@@ -137,6 +137,13 @@
 import { useState } from "react";
 
 export default function TestMultiUploadPage() {
+
+  /* ✅ CENTRALIZED API BASE */
+const API_BASE =
+  process.env.NEXT_PUBLIC_BACKEND_URL ||
+  "https://evermoment-frontend-1.onrender.com";
+
+
   const [files, setFiles] = useState([]);
   const [progress, setProgress] = useState(0);
   const [uploading, setUploading] = useState(false);
@@ -163,7 +170,7 @@ export default function TestMultiUploadPage() {
 
       // Presign
       const presignRes = await fetch(
-        "http://localhost:5000/api/uploads/presign",
+        "${API_BASE}/api/uploads/presign",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -203,7 +210,7 @@ export default function TestMultiUploadPage() {
 
   // 2️⃣ Finalize upload (THIS is where backend is notified)
   const finalizeUpload = async () => {
-    await fetch("http://localhost:5000/api/uploads/complete", {
+    await fetch("${API_BASE}/api/uploads/complete", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

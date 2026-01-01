@@ -2,6 +2,11 @@
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 
+/* ✅ CENTRALIZED API BASE */
+const API_BASE =
+  process.env.NEXT_PUBLIC_BACKEND_URL ||
+  "https://evermoment-frontend-1.onrender.com";
+
 export default function AdminUploadPage() {
   const { orderId } = useParams();
   const router = useRouter();
@@ -19,7 +24,7 @@ export default function AdminUploadPage() {
 
       // 1️⃣ Presign
       const presignRes = await fetch(
-        "http://localhost:5000/api/uploads/presign",
+        "${API_BASE}/api/uploads/presign",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -42,7 +47,7 @@ export default function AdminUploadPage() {
 
       // 3️⃣ Update order
       await fetch(
-        `http://localhost:5000/api/admin/orders/${orderId}/upload`,
+        `${API_BASE}/api/admin/orders/${orderId}/upload`,
         {
           method: "POST",
           headers: {

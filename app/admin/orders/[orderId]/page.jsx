@@ -3,6 +3,10 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 
+/* ✅ CENTRALIZED API BASE */
+
+
+
 export default function AdminOrderDetailsPage() {
   const { orderId } = useParams();
   const router = useRouter();
@@ -10,9 +14,12 @@ export default function AdminOrderDetailsPage() {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const API_BASE =
+  process.env.NEXT_PUBLIC_BACKEND_URL ||
+  "https://evermoment-frontend-1.onrender.com";
 
   useEffect(() => {
-    fetch(`http://localhost:5000/api/admin/orders/${orderId}`, {
+    fetch(`${API_BASE}/api/admin/orders/${orderId}`, {
       headers: {
         "x-admin-secret": process.env.NEXT_PUBLIC_ADMIN_SECRET,
       },
@@ -56,7 +63,7 @@ export default function AdminOrderDetailsPage() {
 
   const sendPaymentLink = async () => {
     await fetch(
-      `http://localhost:5000/api/admin/orders/${order.id}/send-payment-link`,
+      `${API_BASE}/api/admin/orders/${order.id}/send-payment-link`,
       {
         method: "POST",
         headers: {
