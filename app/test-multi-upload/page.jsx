@@ -139,9 +139,12 @@ import { useState } from "react";
 export default function TestMultiUploadPage() {
 
   /* ✅ CENTRALIZED API BASE */
-const API_BASE =
-  process.env.NEXT_PUBLIC_BACKEND_URL ||
-  "https://evermoment-frontend-1.onrender.com";
+const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
+
+if (!API_BASE) {
+  throw new Error("NEXT_PUBLIC_BACKEND_URL is missing");
+}
+
 
 
   const [files, setFiles] = useState([]);
@@ -170,7 +173,7 @@ const API_BASE =
 
       // Presign
       const presignRes = await fetch(
-        "${API_BASE}/api/uploads/presign",
+        '${API_BASE}/api/uploads/presign',
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -210,7 +213,7 @@ const API_BASE =
 
   // 2️⃣ Finalize upload (THIS is where backend is notified)
   const finalizeUpload = async () => {
-    await fetch("${API_BASE}/api/uploads/complete", {
+    await fetch('${API_BASE}/api/uploads/complete', {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

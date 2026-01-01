@@ -7,9 +7,12 @@ import { useState, FormEvent } from "react";
 export default function ContactPage() {
 
   /* ✅ CENTRALIZED API BASE */
-const API_BASE =
-  process.env.NEXT_PUBLIC_BACKEND_URL ||
-  "https://evermoment-frontend-1.onrender.com";
+const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
+
+if (!API_BASE) {
+  throw new Error("NEXT_PUBLIC_BACKEND_URL is missing");
+}
+
 
     const [form, setForm] = useState({
     name: "",

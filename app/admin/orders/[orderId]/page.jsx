@@ -14,9 +14,13 @@ export default function AdminOrderDetailsPage() {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const API_BASE =
-  process.env.NEXT_PUBLIC_BACKEND_URL ||
-  "https://evermoment-frontend-1.onrender.com";
+  
+const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
+
+if (!API_BASE) {
+  throw new Error("NEXT_PUBLIC_BACKEND_URL is missing");
+}
+
 
   useEffect(() => {
     fetch(`${API_BASE}/api/admin/orders/${orderId}`, {

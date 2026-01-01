@@ -10,9 +10,13 @@ import { useEffect, useState, useCallback } from "react";
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const API_BASE =
-  process.env.NEXT_PUBLIC_BACKEND_URL ||
-  "https://evermoment-frontend-1.onrender.com";
+
+const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
+
+if (!API_BASE) {
+  throw new Error("NEXT_PUBLIC_BACKEND_URL is missing");
+}
+
 
   /* =====================
      FETCH ORDERS

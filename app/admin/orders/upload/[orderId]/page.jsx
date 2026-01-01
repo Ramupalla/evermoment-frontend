@@ -3,9 +3,12 @@ import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 
 /* ✅ CENTRALIZED API BASE */
-const API_BASE =
-  process.env.NEXT_PUBLIC_BACKEND_URL ||
-  "https://evermoment-frontend-1.onrender.com";
+const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
+
+if (!API_BASE) {
+  throw new Error("NEXT_PUBLIC_BACKEND_URL is missing");
+}
+
 
 export default function AdminUploadPage() {
   const { orderId } = useParams();

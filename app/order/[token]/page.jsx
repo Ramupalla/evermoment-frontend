@@ -15,66 +15,23 @@ const STEPS = [
 
 export default function OrderStatusPage() {
   
+const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-const API_BASE =
-  process.env.NEXT_PUBLIC_BACKEND_URL ||
-  "https://evermoment-frontend-1.onrender.com";
-
-  const { token } = useParams();
-  const router = useRouter();
-
-  const [data, setData] = useState(null);
-  const [error, setError] = useState("");
-// -----------
-  // const [orderId, setOrderId] = useState(null);
-  // const [selectedFiles, setSelectedFiles] = useState([]);
-  // const [uploading, setUploading] = useState(false);
-// -----------
-  // useEffect(() => {
-  //   if (!token) return;
-
-  //   fetch(`http://localhost:5000/api/orders/access/${token}`)
-  //     .then((res) => res.json())
-  //     .then((d) => {
-  //       if (d?.error) setError(d.error);
-  //       else setData(d);
-  //     })
-  //     .catch(() => setError("Unable to fetch order status"));
-  // }, [token]);
-
-
-//   useEffect(() => {
-//   if (!token) return;
-
-//   fetch(`http://localhost:5000/api/orders/access/${token}`)
-//     .then((res) => res.json()) // ✅ THIS LINE WAS MISSING
-//     .then((d) => {
-//       if (d?.error) {
-//         setError(d.error);
-//       } else {
-//         setData(d);
-//         setOrderId(d.id); // UUID from DB
-//       }
-//     })
-//     .catch(() => setError("Unable to fetch order status"));
-// }, [token]);
-
+if (!API_BASE) {
+  throw new Error("NEXT_PUBLIC_BACKEND_URL missing");
+}
 
 useEffect(() => {
   if (!token) return;
 
   fetch(`${API_BASE}/api/orders/access/${token}`)
-    .then(async (res) => {
+    .then(async res => {
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "Fetch failed");
       return json;
     })
-    .then((order) => {
-      setData(order);
-    })
-    .catch(() => {
-      setError("Unable to fetch order status");
-    });
+    .then(setData)
+    .catch(() => setError("Unable to fetch order status"));
 }, [token]);
 
   if (error) {

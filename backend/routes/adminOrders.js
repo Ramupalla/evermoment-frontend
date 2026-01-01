@@ -96,9 +96,15 @@ router.post("/:orderId/send-payment-link", async (req, res) => {
       return res.status(400).json({ error: "Already paid" });
     }
 
-    const paymentLink =
-      order.payment_link ||
-      `${process.env.FRONTEND_URL}/payment/${order.access_token}`;
+   const FRONTEND_URL = process.env.FRONTEND_URL;
+
+if (!FRONTEND_URL) {
+  throw new Error("FRONTEND_URL not configured");
+}
+
+const paymentLink =
+  order.payment_link ||
+  `${FRONTEND_URL}/payment/${order.access_token}`;
 
     await pool.query(
       `

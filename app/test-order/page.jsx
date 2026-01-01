@@ -2,12 +2,15 @@
 
 export default function TestOrderPage() {
   /* ✅ CENTRALIZED API BASE */
-const API_BASE =
-  process.env.NEXT_PUBLIC_BACKEND_URL ||
-  "https://evermoment-frontend-1.onrender.com";
-  
+const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
+
+if (!API_BASE) {
+  throw new Error("NEXT_PUBLIC_BACKEND_URL is missing");
+}
+
+
   const createOrder = async () => {
-    const res = await fetch("${API_BASE}/api/orders", {
+    const res = await fetch('${API_BASE}/api/orders', {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
