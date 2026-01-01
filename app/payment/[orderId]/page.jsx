@@ -92,7 +92,7 @@ export default function PaymentPage() {
   setLoading(true);
 
   const res = await fetch(
-    "${API_BASE}/api/payments/create-order",
+    '${API_BASE}/api/payments/create-order',
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -114,7 +114,7 @@ export default function PaymentPage() {
     handler: async (response) => {
       try {
         const verifyRes = await fetch(
-          "${API_BASE}/api/payments/verify",
+          '${API_BASE}/api/payments/verify',
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },

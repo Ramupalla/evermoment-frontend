@@ -113,7 +113,7 @@ const uploadFiles = async () => {
 
     for (const file of selectedFiles) {
       // 1️⃣ Get presigned URL
-      const presignRes = await fetch("${API_BASE}/api/uploads/presign",
+      const presignRes = await fetch('${API_BASE}/api/uploads/presign',
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -142,7 +142,7 @@ const uploadFiles = async () => {
     }
 
     // 3️⃣ Finalize upload
-    await fetch("${API_BASE}/api/uploads/complete", {
+    await fetch('${API_BASE}/api/uploads/complete', {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
