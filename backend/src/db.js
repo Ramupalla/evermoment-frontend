@@ -29,7 +29,6 @@
 
 // export default pool;
 
-
 import mysql from "mysql2/promise";
 import dotenv from "dotenv";
 
@@ -38,21 +37,25 @@ dotenv.config();
 /* =========================
    DATABASE CONNECTION
 ========================= */
-
-// Railway provides a single connection URL
-const DATABASE_URL =
-  process.env.MYSQL_URL || process.env.MYSQL_MYSQL_URL;
+const DATABASE_URL = process.env.DATABASE_URL;
 
 if (!DATABASE_URL) {
-  console.error("❌ DATABASE URL NOT FOUND");
-  process.exit(1);
+  throw new Error("❌ DATABASE_URL is not set");
 }
 
 const pool = mysql.createPool(DATABASE_URL);
 
 /* =========================
-   DEBUG (SAFE)
+   HEALTH CHECK (SAFE)
 ========================= */
-console.log("✅ MySQL connected via Railway URL");
+(async () => {
+  try {
+    const conn = await pool.getConnection();
+    console.log("✅ MySQL connected successfully");
+    conn.release();
+  } catch (err) {
+    console.error("❌ MySQL connection failed:", err.message);
+  }
+})();
 
 export default pool;
