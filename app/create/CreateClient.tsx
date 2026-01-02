@@ -103,40 +103,126 @@ if (!API_BASE) {
   /* =====================
      SUBMIT
      ===================== */
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+
+  //   if (!selectedPlan || !finalMomentType) {
+  //     alert("Please complete required fields");
+  //     return;
+  //   }
+
+  //   setSubmitting(true);
+
+  //   try {
+  //     const res = await fetch(`${API_BASE}/api/orders`, {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({
+  //         email: formData.email,
+  //         whatsapp: formData.whatsappNumber,
+  //         momentType: finalMomentType,
+  //         specialBecause: formData.specialBecause,
+  //         plan: selectedPlan,
+  //         fastTrack,
+  //       }),
+  //     });
+
+  //     const data = await res.json();
+  //     if (!res.ok) throw new Error(data.error || "Order creation failed");
+
+  //     router.push(`/order/${data.accessToken}`);
+  //   } catch (err: any) {
+  //     alert(err.message);
+  //   } finally {
+  //     setSubmitting(false);
+  //   }
+  // };
+
+
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!selectedPlan || !finalMomentType) {
-      alert("Please complete required fields");
-      return;
-    }
+  if (!selectedPlan || !finalMomentType) {
+    alert("Please complete required fields");
+    return;
+  }
 
-    setSubmitting(true);
+  setSubmitting(true);
 
-    try {
-      const res = await fetch(`${API_BASE}/api/orders`, {
+  try {
+    // 1️⃣ Create order
+    const res = await fetch(`${API_BASE}/api/orders`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: formData.email,
+        whatsapp: formData.whatsappNumber,
+        momentType: finalMomentType,
+        specialBecause: formData.specialBecause,
+        plan: selectedPlan,
+        fastTrack,
+      }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Order creation failed");
+
+    const { orderId, accessToken } = data;
+
+    // 2️⃣ Upload files to S3 (ONLY if files exist)
+    if (uploadedFiles.length > 0) {
+      const uploaded = [];
+
+      for (const f of uploadedFiles) {
+        // Get presigned URL
+        const presignRes = await fetch(`${API_BASE}/api/uploads/presign`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            orderId,
+            fileName: f.file.name,
+            fileType: f.file.type,
+          }),
+        });
+
+        const presign = await presignRes.json();
+        if (!presign.uploadUrl || !presign.key) {
+          throw new Error("Failed to prepare upload");
+        }
+
+        // Upload to S3
+        await fetch(presign.uploadUrl, {
+          method: "PUT",
+          headers: { "Content-Type": f.file.type },
+          body: f.file,
+        });
+
+        uploaded.push({
+          key: presign.key,
+          type: f.type,
+          originalName: f.file.name,
+        });
+      }
+
+      // Finalize upload
+      await fetch(`${API_BASE}/api/uploads/complete`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          email: formData.email,
-          whatsapp: formData.whatsappNumber,
-          momentType: finalMomentType,
-          specialBecause: formData.specialBecause,
-          plan: selectedPlan,
-          fastTrack,
+          orderId,
+          files: uploaded,
         }),
       });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Order creation failed");
-
-      router.push(`/order/${data.accessToken}`);
-    } catch (err: any) {
-      alert(err.message);
-    } finally {
-      setSubmitting(false);
     }
-  };
+
+    // 3️⃣ Redirect AFTER everything succeeds
+    router.push(`/order/${accessToken}`);
+  } catch (err: any) {
+    alert(err.message);
+  } finally {
+    setSubmitting(false);
+  }
+};
 
   /* ================= UI ================= */
 
@@ -168,7 +254,7 @@ if (!API_BASE) {
               </div>
             ))}
           </div>
-
+   
           {/* FAST TRACK (REFERENCE IMPLEMENTATION) */}
           {selectedPlan === "story" && (
             <div
@@ -318,7 +404,11 @@ if (!API_BASE) {
       </div>
     </div>
   );
+
+
+
 }
+
 
 
 // The above code has perfect UI
