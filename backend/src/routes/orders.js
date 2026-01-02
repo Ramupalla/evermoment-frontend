@@ -556,6 +556,54 @@ router.post("/", async (req, res) => {
 /* =========================
    ACCESS ORDER (CLIENT)
 ========================= */
+// router.get("/access/:token", async (req, res) => {
+//   try {
+//     const { token } = req.params;
+
+//     const [rows] = await pool.query(
+//       `
+//       SELECT
+//         id,
+//         status,
+//         plan,
+//         fast_track AS fastTrack,
+//         base_amount,
+//         fast_track_amount,
+//         amount,
+//         payment_status,
+//         delivery_unlocked,
+//         created_at
+//       FROM orders
+//       WHERE access_token = ?
+//       `,
+//       [token]
+//     );
+
+//     if (!rows.length) {
+//       return res.status(404).json({ error: "Order not found" });
+//     }
+//     // 📧 Email (NON-BLOCKING – NEVER break response)
+//     sendOrderConfirmationEmail({
+//       email,
+//       orderId,
+//       plan,
+//       fastTrack: fastTrackAllowed,
+//       base_amount: baseAmount,
+//       fast_track_amount: fastTrackAmount,
+//     }).catch((err) =>
+//       console.error("ORDER CONFIRMATION EMAIL FAILED:", err.message)
+//     );
+
+//     return res.json(rows[0]);
+//   } catch (err) {
+//     console.error("ACCESS ORDER ERROR:", err);
+//     return res.status(500).json({ error: "Failed to fetch order" });
+//   }
+// });
+
+/* =========================
+   ACCESS ORDER (CLIENT)
+========================= */
 router.get("/access/:token", async (req, res) => {
   try {
     const { token } = req.params;
@@ -582,24 +630,16 @@ router.get("/access/:token", async (req, res) => {
     if (!rows.length) {
       return res.status(404).json({ error: "Order not found" });
     }
-    // 📧 Email (NON-BLOCKING – NEVER break response)
-    sendOrderConfirmationEmail({
-      email,
-      orderId,
-      plan,
-      fastTrack: fastTrackAllowed,
-      base_amount: baseAmount,
-      fast_track_amount: fastTrackAmount,
-    }).catch((err) =>
-      console.error("ORDER CONFIRMATION EMAIL FAILED:", err.message)
-    );
 
+    // ✅ JUST RETURN DATA — NO EMAILS HERE
     return res.json(rows[0]);
+
   } catch (err) {
     console.error("ACCESS ORDER ERROR:", err);
     return res.status(500).json({ error: "Failed to fetch order" });
   }
 });
+
 
 /* =========================
    SEND FINAL DELIVERY EMAIL
