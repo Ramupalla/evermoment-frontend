@@ -832,8 +832,6 @@
 
 
 // ######################################3# The above code worked perfect
-
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -859,11 +857,10 @@ const STEPS = [
 ];
 
 export default function OrderStatusPage() {
-  const params = useParams();
-  const token = params?.token;
+  const { token } = useParams();
   const router = useRouter();
 
-const [data, setData] = useState(null);
+  const [data, setData] = useState(null);
   const [error, setError] = useState("");
 
   /* =======================
@@ -871,8 +868,14 @@ const [data, setData] = useState(null);
   ======================= */
   useEffect(() => {
     if (!token) return;
+    
 
     fetch(`${API_BASE}/api/orders/access/${token}`)
+    .then((json) => {
+  console.log("ORDER API RESPONSE:", json);
+  setData(json);
+})
+
       .then(async (res) => {
         const json = await res.json();
         if (!res.ok) throw new Error(json.error || "Fetch failed");
@@ -882,6 +885,8 @@ const [data, setData] = useState(null);
       .catch(() => setError("Unable to fetch order status"));
   }, [token]);
 
+
+  
   if (error) {
     return <div style={page}><h2>{error}</h2></div>;
   }
@@ -889,6 +894,14 @@ const [data, setData] = useState(null);
   if (!data) {
     return <div style={page}><h2>Loading your EverMoment…</h2></div>;
   }
+
+  /* =======================
+     NORMALIZED VALUES
+  ======================= */
+  const fastTrackEnabled = Boolean(Number(data.fast_track));
+  const fastTrackAmount = Number(data.fast_track_amount || 0);
+  const baseAmount = Number(data.base_amount || 0);
+  const totalAmount = Number(data.amount || baseAmount + fastTrackAmount);
 
   const derivedStatus =
     data.delivery_unlocked
@@ -909,48 +922,38 @@ const [data, setData] = useState(null);
       </h1>
 
       <p style={statusText}>
-        <strong>
-          🎉 Your order is {humanize(derivedStatus)} successfully!
-        </strong>
+        <strong>🎉 Your order is {humanize(derivedStatus)} successfully!</strong>
       </p>
 
-      {/* ✅ PREMIUM SUMMARY BOX */}
+      {/* ✅ ORDER SUMMARY */}
       <div style={summaryBox}>
         <div style={summaryRow}>
           <span><strong>Plan</strong></span>
-          {humanize(data.plan)}: ₹{data.base_amount}
+          <span>{humanize(data.plan)} — ₹{baseAmount}</span>
         </div>
 
         <div style={summaryRow}>
           <span><strong>Fast Track</strong></span>
-          {data.fast_track ? "Yes ⚡" : "No"}
+          <span>{fastTrackEnabled ? "Yes ⚡" : "No"}</span>
         </div>
 
-        {data.fast_track && data.fast_track_amount > 0 && (
+        {fastTrackEnabled && fastTrackAmount > 0 && (
           <div style={summaryRowMuted}>
-            <span>Add-on Fast Track</span>
-            ₹{data.fast_track_amount}
+            <span>Fast Track Add-on</span>
+            <span>₹{fastTrackAmount}</span>
           </div>
         )}
-        
 
         <div style={divider} />
 
         <div style={summaryTotal}>
           <span>Total Amount</span>
-          ₹{data.amount}
+          <span>₹{totalAmount}</span>
         </div>
       </div>
 
-      <p
-        style={{
-          marginTop: 6,
-          fontSize: 14,
-          opacity: 0.65,
-          animation: "softFadeUp 1.2s ease-out forwards",
-        }}
-      >
-        You will receive email confirmation shortly…
+      <p style={{ fontSize: 14, opacity: 0.65 }}>
+        You’ll receive email confirmation shortly…
       </p>
 
       {/* TIMELINE */}
@@ -982,7 +985,6 @@ const [data, setData] = useState(null);
                 style={{
                   ...label,
                   opacity: isActive ? 1 : 0.6,
-                  fontWeight: isActive ? 500 : 400,
                 }}
               >
                 {humanize(step)}
@@ -1017,11 +1019,13 @@ const [data, setData] = useState(null);
    HELPERS
 ======================= */
 function humanize(s) {
-  return typeof s === "string" ? s.replace(/_/g, " ") : "";
+  return typeof s === "string"
+    ? s.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())
+    : "";
 }
 
 /* =======================
-   STYLES
+   STYLES (unchanged)
 ======================= */
 
 const page = {
@@ -1032,7 +1036,7 @@ const page = {
   flexDirection: "column",
   alignItems: "center",
   justifyContent: "center",
-  gap: "clamp(20px, 4vw, 28px)",
+  gap: "24px",
   padding: "16px",
 };
 
@@ -1043,7 +1047,6 @@ const summaryBox = {
   boxShadow: "0 30px 80px rgba(116,108,108,0.45)",
   width: "100%",
   maxWidth: "360px",
-  animation: "softScaleIn 0.5s ease-out",
 };
 
 const summaryRow = {
@@ -1060,7 +1063,7 @@ const summaryRowMuted = {
 const summaryTotal = {
   display: "flex",
   justifyContent: "space-between",
-  fontSize: "18px",
+  fontSize: 18,
   fontWeight: 600,
 };
 
@@ -1071,17 +1074,13 @@ const divider = {
 };
 
 const statusText = {
-  fontSize: "clamp(18px, 4.5vw, 22px)",
-  lineHeight: 1.3,
+  fontSize: 20,
 };
-
-/* Timeline */
 
 const timeline = {
   display: "flex",
   flexDirection: "column",
   gap: 16,
-  marginTop: 24,
 };
 
 const stepRow = {
@@ -1111,10 +1110,7 @@ const activeLine = {
 
 const label = {
   fontSize: 14,
-  color: "#e5e7eb",
 };
-
-/* Buttons */
 
 const primaryBtn = {
   padding: "14px 24px",

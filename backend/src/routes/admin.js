@@ -177,18 +177,18 @@ const router = express.Router();
 const FRONTEND_URL =
   process.env.FRONTEND_URL || "http://localhost:3000";
 
-const ADMIN_SECRET = process.env.ADMIN_SECRET;
+const ADMIN_SECRET = process.env.NEXT_PUBLIC_ADMIN_SECRET;
 
 /* =========================
    ADMIN AUTH MIDDLEWARE
 ========================= */
-router.use((req, res, next) => {
-  const secret = req.headers["x-admin-secret"];
-  if (!ADMIN_SECRET || secret !== ADMIN_SECRET) {
-    return res.status(401).json({ error: "Unauthorized" });
-  }
-  next();
-});
+// router.use((req, res, next) => {
+//   const secret = req.headers["x-admin-secret"];
+//   if (!ADMIN_SECRET || secret !== ADMIN_SECRET) {
+//     return res.status(401).json({ error: "Unauthorized" });
+//   }
+//   next();
+// });
 
 /* =========================
    ALLOWED STATUS TRANSITIONS

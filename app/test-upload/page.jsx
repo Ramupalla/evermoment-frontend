@@ -25,7 +25,7 @@ if (!API_BASE) {
     console.log("Selected file:", file.name);
 
     // 1️⃣ Get presigned URL
-    const presignRes = await fetch("${API_BASE}/api/uploads/presign", {
+    const presignRes = await fetch('${API_BASE}/api/uploads/presign', {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -53,7 +53,7 @@ if (!API_BASE) {
 
     // 3️⃣ Notify backend upload is complete
     const completeRes = await fetch(
-      "${API_BASE}/api/uploads/complete",
+      `${API_BASE}/api/uploads/complete`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },

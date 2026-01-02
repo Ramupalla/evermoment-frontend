@@ -14,7 +14,7 @@ export default function PricingPage() {
         "Smooth transitions",
         "Basic color correction",
         "HD quality (1080p)",
-        "One final export"
+        "One final expor"
       ],
       icon: "🎬",
       popular: false,

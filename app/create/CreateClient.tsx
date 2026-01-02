@@ -100,44 +100,6 @@ if (!API_BASE) {
       ? formData.customMomentType
       : formData.momentType;
 
-  /* =====================
-     SUBMIT
-     ===================== */
-  // const handleSubmit = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-
-  //   if (!selectedPlan || !finalMomentType) {
-  //     alert("Please complete required fields");
-  //     return;
-  //   }
-
-  //   setSubmitting(true);
-
-  //   try {
-  //     const res = await fetch(`${API_BASE}/api/orders`, {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({
-  //         email: formData.email,
-  //         whatsapp: formData.whatsappNumber,
-  //         momentType: finalMomentType,
-  //         specialBecause: formData.specialBecause,
-  //         plan: selectedPlan,
-  //         fastTrack,
-  //       }),
-  //     });
-
-  //     const data = await res.json();
-  //     if (!res.ok) throw new Error(data.error || "Order creation failed");
-
-  //     router.push(`/order/${data.accessToken}`);
-  //   } catch (err: any) {
-  //     alert(err.message);
-  //   } finally {
-  //     setSubmitting(false);
-  //   }
-  // };
-
 
   const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
@@ -164,7 +126,14 @@ if (!API_BASE) {
       }),
     });
 
-    const data = await res.json();
+    // const data = await res.json();
+
+    if (!res.ok) {
+  throw new Error(`Payment API failed (${res.status})`);
+}
+
+const data = await res.json();
+
     if (!res.ok) throw new Error(data.error || "Order creation failed");
 
     const { orderId, accessToken } = data;

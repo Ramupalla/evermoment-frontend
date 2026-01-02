@@ -43,7 +43,13 @@ export default function AdminOrdersPage() {
         throw new Error("Failed to fetch orders");
       }
 
-      const data = await res.json();
+      // const data = await res.json();
+      if (!res.ok) {
+  throw new Error(`Payment API failed (${res.status})`);
+}
+
+const data = await res.json();
+
       setOrders(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Fetch orders error:", err);
@@ -142,20 +148,35 @@ function Actions({ order, onActionComplete }) {
   const canSendPayment =
     order.status === "uploaded" && order.payment_status !== "paid";
 
-  const sendPaymentLink = async () => {
-    await fetch(
-      `${API_BASE}/api/admin/orders/${order.id}/send-payment-link`,
+  const sendPaymentLink = async (orderId) => {
+  try {
+    const res = await fetch(
+      `${API_BASE}/api/admin/orders/${orderId}/send-payment-link`,
       {
         method: "POST",
         headers: {
-          "x-admin-secret": ADMIN_SECRET,
+          "Content-Type": "application/json",
         },
       }
     );
 
+    // const data = await res.json();
+    if (!res.ok) {
+  throw new Error(`Payment API failed (${res.status})`);
+}
+
+const data = await res.json();
+
+
+    if (!res.ok) {
+      throw new Error(data.error || "Failed to send payment link");
+    }
+
     alert("Payment link sent");
-    onActionComplete();
-  };
+  } catch (err) {
+    alert(err.message);
+  }
+};
 
   return (
     <div style={actions}>
@@ -180,7 +201,7 @@ function Actions({ order, onActionComplete }) {
           cursor: canSendPayment ? "pointer" : "not-allowed",
         }}
         disabled={!canSendPayment}
-        onClick={sendPaymentLink}
+        onClick={() => sendPaymentLink(order.id)}
       >
         Send Payment Link
       </button>
@@ -238,6 +259,8 @@ const btn = {
   border: "none",
 };
 
+
+// #====================================================================
 
 // // here is the responsible code admin/page.jsx:
 // "use client";

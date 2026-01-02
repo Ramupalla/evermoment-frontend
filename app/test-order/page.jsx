@@ -10,7 +10,7 @@ if (!API_BASE) {
 
 
   const createOrder = async () => {
-    const res = await fetch('${API_BASE}/api/orders', {
+    const res = await fetch(`${API_BASE}/api/orders`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -21,7 +21,14 @@ if (!API_BASE) {
       }),
     });
 
-    const data = await res.json();
+    // const data = await res.json();
+
+    if (!res.ok) {
+  throw new Error(`Payment API failed (${res.status})`);
+}
+
+const data = await res.json();
+
     console.log("ORDER RESPONSE:", data);
     alert("Order API called — check console");
   };

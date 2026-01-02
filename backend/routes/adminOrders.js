@@ -1,5 +1,5 @@
 import express from "express";
-import pool from "../db.js";
+import pool from "../src/db.js";
 import { sendEmail } from "../utils/sendEmail.js";
 
 const router = express.Router();
@@ -31,38 +31,7 @@ router.get("/", async (req, res) => {
 
 /* ===============================
    UPLOAD FINAL VIDEO (CRITICAL)
-================================ */
-router.post("/:orderId/upload", async (req, res) => {
-  try {
-    const { orderId } = req.params;
-    const { deliveryUrl } = req.body;
-
-    if (!deliveryUrl) {
-      return res.status(400).json({ error: "deliveryUrl required" });
-    }
-
-    await pool.query(
-      `
-      UPDATE orders
-      SET
-        delivery_url = ?,
-        status = 'uploaded'
-      WHERE id = ?
-      `,
-      [deliveryUrl, orderId]
-    );
-
-    res.json({ success: true });
-  } catch (err) {
-    console.error("UPLOAD FINAL VIDEO ERROR:", err);
-    res.status(500).json({ error: "Failed to save final video" });
-  }
-});
-
-/* ===============================
-   SEND PAYMENT LINK
-================================ */
-router.post("/:orderId/send-payment-link", async (req, res) => {
+================================ */router.post("/:orderId/send-payment-link", async (req, res) => {
   try {
     const { orderId } = req.params;
 
@@ -96,15 +65,20 @@ router.post("/:orderId/send-payment-link", async (req, res) => {
       return res.status(400).json({ error: "Already paid" });
     }
 
-   const FRONTEND_URL = process.env.FRONTEND_URL;
+    const FRONTEND_URL = process.env.FRONTEND_URL;
+    if (!FRONTEND_URL) {
+      throw new Error("FRONTEND_URL not configured");
+    }
 
-if (!FRONTEND_URL) {
-  throw new Error("FRONTEND_URL not configured");
-}
+    if (order.status === "ready_for_payment") {
+      return res.json({
+        success: true,
+        payment_link: order.payment_link,
+        message: "Payment link already sent",
+      });
+    }
 
-const paymentLink =
-  order.payment_link ||
-  `${FRONTEND_URL}/payment/${order.access_token}`;
+    const paymentLink = `${FRONTEND_URL}/payment/${order.access_token}`;
 
     await pool.query(
       `
@@ -128,16 +102,7 @@ const paymentLink =
 
     res.json({ success: true, payment_link: paymentLink });
   } catch (err) {
-    console.error(err);
+    console.error("SEND PAYMENT LINK ERROR:", err);
     res.status(500).json({ error: "Failed to send payment link" });
   }
-
 });
-
-function extractS3Key(deliveryUrl) {
-  if (!deliveryUrl) return null;
-  return deliveryUrl.replace(/^s3:\/\/[^/]+\//, "");
-}
-
-
-export default router;

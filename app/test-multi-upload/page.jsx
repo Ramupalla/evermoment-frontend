@@ -173,7 +173,7 @@ if (!API_BASE) {
 
       // Presign
       const presignRes = await fetch(
-        '${API_BASE}/api/uploads/presign',
+        `${API_BASE}/api/uploads/presign`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -213,7 +213,7 @@ if (!API_BASE) {
 
   // 2️⃣ Finalize upload (THIS is where backend is notified)
   const finalizeUpload = async () => {
-    await fetch('${API_BASE}/api/uploads/complete', {
+    await fetch(`${API_BASE}/api/uploads/complete`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
