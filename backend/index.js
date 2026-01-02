@@ -18,18 +18,38 @@ const app = express();
 ========================= */
 
 // ✅ Explicit CORS (IMPORTANT)
+// app.use(
+//   cors({
+//     origin: [
+//       "http://localhost:3000",
+//       process.env.FRONTEND_URL, // Vercel URL
+//     ],
+//     methods: ["GET", "POST", "PATCH", "PUT", "DELETE"],
+//     allowedHeaders: ["Content-Type", "Authorization", "x-admin-secret"],
+//   })
+// );
+
+// app.use(express.json());
+/* =========================
+   GLOBAL MIDDLEWARE
+========================= */
 app.use(
   cors({
     origin: [
+      "https://evermoment-frontend-ofla.vercel.app",
+      "https://evermoment-frontend-jvs5.vercel.app",
       "http://localhost:3000",
-      process.env.FRONTEND_URL, // Vercel URL
     ],
-    methods: ["GET", "POST", "PATCH", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "x-admin-secret"],
+    credentials: true,
   })
 );
 
+app.options("*", cors());
 app.use(express.json());
+
+
 
 /* =========================
    HEALTH CHECK
