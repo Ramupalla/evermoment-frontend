@@ -21,28 +21,52 @@ if (!API_BASE) {
   /* =====================
      FETCH ORDERS
      ===================== */
-  const fetchOrders = useCallback(() => {
-    fetch("${API_BASE}/api/admin/orders", {
-      headers: {
-        "x-admin-secret": process.env.NEXT_PUBLIC_ADMIN_SECRET,
-      },
+ useEffect(() => {
+  const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
+  const ADMIN_SECRET = process.env.NEXT_PUBLIC_ADMIN_SECRET;
+
+  if (!API_BASE || !ADMIN_SECRET) {
+    console.error("Admin env vars missing");
+    return;
+  }
+
+  fetch(`${API_BASE}/api/admin/orders`, {
+    headers: {
+      "x-admin-secret": ADMIN_SECRET,
+    },
+  })
+    .then((res) => {
+      if (!res.ok) throw new Error("Unauthorized");
+      return res.json();
     })
-      .then((res) => res.json())
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setOrders(data);
-        } else {
-          console.error("Admin API error:", data);
-          setOrders([]);
-        }
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Fetch failed:", err);
-        setOrders([]);
-        setLoading(false);
-      });
-  }, []);
+    .then((data) => {
+      if (Array.isArray(data)) {
+        setOrders(data);
+      } else {
+        console.error("Unexpected response", data);
+      }
+    })
+    .catch((err) => {
+      console.error("Admin fetch failed:", err.message);
+    });
+}, []);
+
+  //     .then((res) => res.json())
+  //     .then((data) => {
+  //       if (Array.isArray(data)) {
+  //         setOrders(data);
+  //       } else {
+  //         console.error("Admin API error:", data);
+  //         setOrders([]);
+  //       }
+  //       setLoading(false);
+  //     })
+  //     .catch((err) => {
+  //       console.error("Fetch failed:", err);
+  //       setOrders([]);
+  //       setLoading(false);
+  //     });
+  // }, []);
 
   /* =====================
      AUTO REFRESH
