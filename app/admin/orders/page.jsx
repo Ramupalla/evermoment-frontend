@@ -51,26 +51,33 @@ if (!API_BASE) {
     });
 }, []);
 
-  //     .then((res) => res.json())
-  //     .then((data) => {
-  //       if (Array.isArray(data)) {
-  //         setOrders(data);
-  //       } else {
-  //         console.error("Admin API error:", data);
-  //         setOrders([]);
-  //       }
-  //       setLoading(false);
-  //     })
-  //     .catch((err) => {
-  //       console.error("Fetch failed:", err);
-  //       setOrders([]);
-  //       setLoading(false);
-  //     });
-  // }, []);
+const fetchOrders = useCallback(async () => {
+  try {
+    setLoading(true);
 
-  /* =====================
-     AUTO REFRESH
-     ===================== */
+    const res = await fetch(`${API_BASE}/api/admin/orders`, {
+      headers: {
+        "x-admin-secret": process.env.NEXT_PUBLIC_ADMIN_SECRET,
+      },
+      cache: "no-store",
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || "Failed to fetch orders");
+    }
+
+    setOrders(Array.isArray(data) ? data : []);
+  } catch (err) {
+    console.error("ADMIN FETCH ERROR:", err);
+    setOrders([]);
+  } finally {
+    setLoading(false);
+  }
+}, []);
+
+
   useEffect(() => {
     fetchOrders(); // initial load
 
