@@ -109,6 +109,32 @@ body::before {
     transform: scale(1.2);
   }
 }
+@keyframes buttonSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes glowBreath {
+  0%, 100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+
+@keyframes softScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
 
 /* ======================
    UTILITY CLASSES
@@ -197,20 +223,7 @@ body::before {
   z-index: -1;
 }
 
-@keyframes buttonSpin {
-  to {
-    transform: rotate(360deg);
-  }
-}
 
-@keyframes glowBreath {
-  0%, 100% {
-    opacity: 0.4;
-  }
-  50% {
-    opacity: 0.8;
-  }
-}
 
 
 .section-fade-dark::before {
@@ -240,6 +253,16 @@ body::before {
   pointer-events: none;
   z-index: 30;
 } */
+ @keyframes softFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 0.65;
+    transform: translateY(0);
+  }
+}
 
 
 .section-fade::after {
@@ -262,4 +285,16 @@ body::before {
 
 body {
   overflow-x: hidden;
+}
+
+
+@keyframes softFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 0.65;
+    transform: translateY(0);
+  }
 }

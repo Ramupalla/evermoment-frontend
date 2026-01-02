@@ -564,6 +564,276 @@
 // ######################################################################## Above code worked well with minor issues 11:48AM 02-01-2026 
 
 
+// "use client";
+
+// import { useEffect, useState } from "react";
+// import { useParams, useRouter } from "next/navigation";
+
+// /* =======================
+//    CONFIG
+// ======================= */
+// const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
+// if (!API_BASE) {
+//   throw new Error("NEXT_PUBLIC_BACKEND_URL is missing");
+// }
+
+// /* =======================
+//    ORDER STEPS
+// ======================= */
+// const STEPS = [
+//   "created",
+//   "uploaded",
+//   "ready_for_payment",
+//   "paid",
+//   "delivered",
+// ];
+
+// export default function OrderStatusPage() {
+//   const params = useParams();
+//   const token = params?.token; // ✅ SAFE
+//   const router = useRouter();
+
+//   const [data, setData] = useState(null);
+//   const [error, setError] = useState("");
+
+//   /* =======================
+//      FETCH ORDER
+//   ======================= */
+//   useEffect(() => {
+//     if (!token) return;
+
+//     fetch(`${API_BASE}/api/orders/access/${token}`)
+//       .then(async (res) => {
+//         const json = await res.json();
+//         if (!res.ok) throw new Error(json.error || "Fetch failed");
+//         return json;
+//       })
+//       .then(setData)
+//       .catch(() => setError("Unable to fetch order status"));
+//   }, [token]);
+
+//   /* =======================
+//      STATES
+//   ======================= */
+//   if (error) {
+//     return <div style={page}><h2>{error}</h2></div>;
+//   }
+
+//   if (!data) {
+//     return <div style={page}><h2>Loading your EverMoment…</h2></div>;
+//   }
+
+//   const derivedStatus =
+//     data.delivery_unlocked
+//       ? "delivered"
+//       : data.payment_status === "paid"
+//       ? "paid"
+//       : data.status;
+
+//   const currentIndex = STEPS.indexOf(derivedStatus);
+
+//   /* =======================
+//      UI
+//   ======================= */
+//   return (
+//     <div style={page}>
+// <h1 style={{ fontSize: "32px", fontWeight: 700 }}>
+//   Your EverMoment
+// </h1>
+
+//       <p style={statusText}>
+//   <strong>
+//     🎉 Your order is {humanize(derivedStatus)} successfully!
+//   </strong>
+// </p>
+
+//       <div style={summaryBox}>
+//         <p><strong>Plan:</strong> {data.plan}</p>
+//         <p><strong>Total Amount:</strong> ₹{data.amount}</p>
+//       </div>
+
+//       {/* <p style={statusText}><strong>
+//         🎉 Your order is {humanize(derivedStatus)} successfully! </strong>
+//       </p> */}
+      
+
+// <p
+//   style={{
+//     marginTop: 6,
+//     fontSize: 14,
+//     opacity: 0.65,
+//     animation: "softFadeUp 1.2s ease-out forwards",
+//   }}
+// >
+//   You will receive email confirmation shortly…
+// </p>
+
+      
+// <div style={timeline}>
+//   {STEPS.map((step, idx) => {
+//     const isActive = idx <= currentIndex;
+//     const isLast = idx === STEPS.length - 1;
+
+//     return (
+//       <div key={step} style={stepRow}>
+//         {/* Dot + Line */}
+//         <div style={{ position: "relative" }}>
+//           <div
+//             style={{
+//               ...dot,
+//               background: isActive ? "#22c55e" : "#334155",
+//             }}
+//           />
+//           {!isLast && (
+//             <div
+//               style={{
+//                 ...line,
+//                 ...(idx < currentIndex ? activeLine : {}),
+//               }}
+//             />
+//           )}
+//         </div>
+
+//         {/* Label */}
+//         <span
+//           style={{
+//             ...label,
+//             opacity: isActive ? 1 : 0.6,
+//             fontWeight: isActive ? 500 : 400,
+//           }}
+//         >
+//           {humanize(step)}
+//         </span>
+//       </div>
+//     );
+//   })}
+// </div>
+
+
+
+
+//       {data.status === "ready_for_payment" && (
+//         <button
+//           style={primaryBtn}
+//           onClick={() => router.push(`/payment/${token}`)}
+//         >
+//           Pay & Unlock Your Video
+//         </button>
+//       )}
+
+//       {data.delivery_unlocked && (
+//         <a
+//           href={`${API_BASE}/api/orders/${token}/download`}
+//           style={downloadBtn}
+//         >
+//           ⬇️ Download Your EverMoment
+//         </a>
+//       )}
+//     </div>
+//   );
+// }
+
+// /* =======================
+//    HELPERS
+// ======================= */
+// function humanize(s) {
+//   return typeof s === "string" ? s.replace(/_/g, " ") : "";
+// }
+
+// /* =======================
+//    STYLES
+// ======================= */
+
+// const page = {
+//   minHeight: "100vh",
+//   background: "#0f172a",
+//   color: "#fff",
+//   display: "flex",
+//   flexDirection: "column",
+//   alignItems: "center",
+//   justifyContent: "center",
+//   gap: "clamp(20px, 4vw, 28px)", // responsive spacing
+//   padding: "16px", // ✅ prevents edge cut on mobile
+// };
+
+// const summaryBox = {
+//   border: "1px solid #334155",
+//   padding: "clamp(20px, 5vw, 36px) clamp(18px, 6vw, 42px)", // responsive padding
+//   borderRadius: "18px",
+//   boxShadow: "0 30px 80px rgba(116, 108, 108, 0.45)",
+//   width: "100%",               // ✅ mobile-friendly
+//   maxWidth: "300px",           // desktop stays premium
+//   textAlign: "center",
+//   animation: "softScaleIn 0.5s ease-out",
+// };
+
+// const statusText = {
+//   fontSize: "clamp(18px, 4.5vw, 22px)", // responsive headline
+//   lineHeight: 1.3,
+// };
+
+
+// // Time Line
+
+// const timeline = {
+//   display: "flex",
+//   flexDirection: "column",
+//   gap: "clamp(14px, 3vw, 20px)",
+//   marginTop: "clamp(24px, 5vw, 32px)",
+//   position: "relative",
+// };
+
+// const stepRow = {
+//   display: "flex",
+//   alignItems: "center",
+//   gap: 16,
+//   position: "relative",
+// };
+
+// const dot = {
+//   width: 12,
+//   height: 12,
+//   borderRadius: "50%",
+//   flexShrink: 0,
+//   transition: "background 0.3s ease",
+// };
+
+// const line = {
+//   position: "absolute",
+//   left: 5,
+//   top: 14,
+//   bottom: "-60px", // ⬅ shorter line for mobile
+//   width: 2,
+//   background: "#334155",
+// };
+
+// const activeLine = {
+//   background: "#22c55e",
+// };
+
+// const label = {
+//   fontSize: "clamp(13px, 3.5vw, 14px)", // readable on mobile
+//   color: "#e5e7eb",
+// };
+
+// // Buttons (touch-friendly on mobile)
+
+// const primaryBtn = {
+//   padding: "14px 24px", // ⬆ better touch area
+//   borderRadius: "10px",
+// };
+
+// const downloadBtn = {
+//   padding: "14px 24px",
+//   borderRadius: "10px",
+//   background: "#22c55e",
+//   textDecoration: "none",
+// };
+
+
+// ######################################3# The above code worked perfect
+
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -590,10 +860,10 @@ const STEPS = [
 
 export default function OrderStatusPage() {
   const params = useParams();
-  const token = params?.token; // ✅ SAFE
+  const token = params?.token;
   const router = useRouter();
 
-  const [data, setData] = useState(null);
+const [data, setData] = useState(null);
   const [error, setError] = useState("");
 
   /* =======================
@@ -612,9 +882,6 @@ export default function OrderStatusPage() {
       .catch(() => setError("Unable to fetch order status"));
   }, [token]);
 
-  /* =======================
-     STATES
-  ======================= */
   if (error) {
     return <div style={page}><h2>{error}</h2></div>;
   }
@@ -637,29 +904,92 @@ export default function OrderStatusPage() {
   ======================= */
   return (
     <div style={page}>
-      <h1><strong>Your EverMoment</strong></h1>
-
-      <div style={summaryBox}>
-        <p><strong>Plan:</strong> {data.plan}</p>
-        <p><strong>Total Amount:</strong> ₹{data.amount}</p>
-      </div>
+      <h1 style={{ fontSize: "clamp(28px, 5vw, 36px)", fontWeight: 700 }}>
+        Your EverMoment
+      </h1>
 
       <p style={statusText}>
-        🎉 Your order is {humanize(derivedStatus)} successfully!
+        <strong>
+          🎉 Your order is {humanize(derivedStatus)} successfully!
+        </strong>
       </p>
 
-      <div style={timeline}>
-        {STEPS.map((step, idx) => (
-          <div key={step} style={stepRow}>
-            <div
-              style={{
-                ...dot,
-                background: idx <= currentIndex ? "#22c55e" : "#334155",
-              }}
-            />
-            <span style={label}>{humanize(step)}</span>
+      {/* ✅ PREMIUM SUMMARY BOX */}
+      <div style={summaryBox}>
+        <div style={summaryRow}>
+          <span><strong>Plan</strong></span>
+          {humanize(data.plan)}: ₹{data.base_amount}
+        </div>
+
+        <div style={summaryRow}>
+          <span><strong>Fast Track</strong></span>
+          {data.fast_track ? "Yes ⚡" : "No"}
+        </div>
+
+        {data.fast_track && data.fast_track_amount > 0 && (
+          <div style={summaryRowMuted}>
+            <span>Add-on Fast Track</span>
+            ₹{data.fast_track_amount}
           </div>
-        ))}
+        )}
+        
+
+        <div style={divider} />
+
+        <div style={summaryTotal}>
+          <span>Total Amount</span>
+          ₹{data.amount}
+        </div>
+      </div>
+
+      <p
+        style={{
+          marginTop: 6,
+          fontSize: 14,
+          opacity: 0.65,
+          animation: "softFadeUp 1.2s ease-out forwards",
+        }}
+      >
+        You will receive email confirmation shortly…
+      </p>
+
+      {/* TIMELINE */}
+      <div style={timeline}>
+        {STEPS.map((step, idx) => {
+          const isActive = idx <= currentIndex;
+          const isLast = idx === STEPS.length - 1;
+
+          return (
+            <div key={step} style={stepRow}>
+              <div style={{ position: "relative" }}>
+                <div
+                  style={{
+                    ...dot,
+                    background: isActive ? "#22c55e" : "#334155",
+                  }}
+                />
+                {!isLast && (
+                  <div
+                    style={{
+                      ...line,
+                      ...(idx < currentIndex ? activeLine : {}),
+                    }}
+                  />
+                )}
+              </div>
+
+              <span
+                style={{
+                  ...label,
+                  opacity: isActive ? 1 : 0.6,
+                  fontWeight: isActive ? 500 : 400,
+                }}
+              >
+                {humanize(step)}
+              </span>
+            </div>
+          );
+        })}
       </div>
 
       {data.status === "ready_for_payment" && (
@@ -693,6 +1023,7 @@ function humanize(s) {
 /* =======================
    STYLES
 ======================= */
+
 const page = {
   minHeight: "100vh",
   background: "#0f172a",
@@ -701,24 +1032,98 @@ const page = {
   flexDirection: "column",
   alignItems: "center",
   justifyContent: "center",
-  gap: "16px",
+  gap: "clamp(20px, 4vw, 28px)",
+  padding: "16px",
 };
 
 const summaryBox = {
   border: "1px solid #334155",
-  padding: "20px",
-  borderRadius: "12px",
+  padding: "24px 28px",
+  borderRadius: "18px",
+  boxShadow: "0 30px 80px rgba(116,108,108,0.45)",
+  width: "100%",
+  maxWidth: "360px",
+  animation: "softScaleIn 0.5s ease-out",
 };
 
-const statusText = { fontSize: "18px" };
-const timeline = { display: "flex", flexDirection: "column", gap: "10px" };
-const stepRow = { display: "flex", alignItems: "center", gap: "10px" };
-const dot = { width: "10px", height: "10px", borderRadius: "50%" };
-const label = { textTransform: "capitalize" };
-const primaryBtn = { padding: "12px 22px", borderRadius: "8px" };
+const summaryRow = {
+  display: "flex",
+  justifyContent: "space-between",
+  marginBottom: 8,
+};
+
+const summaryRowMuted = {
+  ...summaryRow,
+  opacity: 0.75,
+};
+
+const summaryTotal = {
+  display: "flex",
+  justifyContent: "space-between",
+  fontSize: "18px",
+  fontWeight: 600,
+};
+
+const divider = {
+  height: 1,
+  background: "#334155",
+  margin: "12px 0",
+};
+
+const statusText = {
+  fontSize: "clamp(18px, 4.5vw, 22px)",
+  lineHeight: 1.3,
+};
+
+/* Timeline */
+
+const timeline = {
+  display: "flex",
+  flexDirection: "column",
+  gap: 16,
+  marginTop: 24,
+};
+
+const stepRow = {
+  display: "flex",
+  alignItems: "center",
+  gap: 16,
+};
+
+const dot = {
+  width: 12,
+  height: 12,
+  borderRadius: "50%",
+};
+
+const line = {
+  position: "absolute",
+  left: 5,
+  top: 14,
+  bottom: "-60px",
+  width: 2,
+  background: "#334155",
+};
+
+const activeLine = {
+  background: "#22c55e",
+};
+
+const label = {
+  fontSize: 14,
+  color: "#e5e7eb",
+};
+
+/* Buttons */
+
+const primaryBtn = {
+  padding: "14px 24px",
+  borderRadius: "10px",
+};
+
 const downloadBtn = {
-  padding: "12px 22px",
-  borderRadius: "8px",
+  padding: "14px 24px",
+  borderRadius: "10px",
   background: "#22c55e",
   textDecoration: "none",
 };
