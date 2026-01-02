@@ -1,5 +1,3 @@
-
-
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
@@ -8,7 +6,6 @@ import { useEffect, useState, useCallback } from "react";
    CONFIG
 ===================== */
 const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
-const ADMIN_SECRET = process.env.NEXT_PUBLIC_ADMIN_SECRET;
 
 if (!API_BASE) {
   throw new Error("NEXT_PUBLIC_BACKEND_URL is missing");
@@ -30,25 +27,41 @@ export default function AdminOrdersPage() {
 
       const res = await fetch(`${API_BASE}/api/admin/orders`, {
         headers: {
-          "x-admin-secret": ADMIN_SECRET,
+          "x-admin-secret": process.env.NEXT_PUBLIC_ADMIN_SECRET,
         },
         cache: "no-store",
       });
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || "Failed to fetch orders");
+      // 🚫 Unauthorized
+      if (res.status === 401) {
+        console.error("Admin unauthorized");
+        setOrders([]);
+        return;
       }
 
+      if (!res.ok) {
+        throw new Error("Failed to fetch orders");
+      }
+
+      const data = await res.json();
       setOrders(Array.isArray(data) ? data : []);
     } catch (err) {
-      console.error("ADMIN FETCH ERROR:", err);
+      console.error("Fetch orders error:", err);
       setOrders([]);
     } finally {
       setLoading(false);
     }
   }, []);
+
+
+  //     setOrders(Array.isArray(data) ? data : []);
+  //   } catch (err) {
+  //     console.error("ADMIN FETCH ERROR:", err);
+  //     setOrders([]);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // }, []);
 
   /* =====================
      AUTO REFRESH
