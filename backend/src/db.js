@@ -4,31 +4,48 @@ import dotenv from "dotenv";
 dotenv.config();
 
 /* =========================
-   DATABASE CONNECTION
+   ENV VALIDATION
 ========================= */
+const {
+  DB_HOST,
+  DB_PORT,
+  DB_USER,
+  DB_PASSWORD,
+  DB_NAME,
+} = process.env;
 
-// Railway MySQL (single source of truth)
-const MYSQL_URL = process.env.MYSQL_MYSQL_URL;
-
-if (!MYSQL_URL) {
-  console.error("❌ MYSQL_MYSQL_URL not found in environment variables");
+if (!DB_HOST || !DB_PORT || !DB_USER || !DB_PASSWORD || !DB_NAME) {
+  console.error("❌ Missing required database environment variables");
   process.exit(1);
 }
 
+/* =========================
+   DATABASE CONNECTION (AIVEN SAFE)
+========================= */
 const pool = mysql.createPool({
-  uri: MYSQL_URL,
+  host: DB_HOST,
+  port: Number(DB_PORT),
+  user: DB_USER,
+  password: DB_PASSWORD,
+  database: DB_NAME,
+
+ // ✅ FIX FOR AIVEN (LOCAL + PROD)
+  ssl: {
+    rejectUnauthorized: false,
+  },
+
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
 });
 
 /* =========================
-   HEALTH CHECK
+   HEALTH CHECK (ON BOOT)
 ========================= */
 (async () => {
   try {
     const conn = await pool.getConnection();
-    console.log("✅ MySQL connected successfully");
+    console.log("✅ MySQL connected successfully (Aiven)");
     conn.release();
   } catch (err) {
     console.error("❌ MySQL connection failed:", err.message);

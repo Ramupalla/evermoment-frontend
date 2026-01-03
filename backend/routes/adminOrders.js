@@ -92,7 +92,7 @@ router.get("/", async (req, res) => {
     if (order.email) {
       await sendEmail({
         to: order.email,
-        subject: "Your EverMoment is ready 💛",
+        subject: "🎉 Your EverMoment Memory✨ Is Ready",
         html: `
           <p>Your EverMoment video is ready.</p>
           <p><a href="${paymentLink}">Pay & Unlock Your Video</a></p>

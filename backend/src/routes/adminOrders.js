@@ -11,6 +11,7 @@ const router = express.Router();
  * =========================
  */
 router.get("/", async (req, res) => {
+  
   try {
     const [rows] = await pool.query(`
       SELECT
@@ -204,14 +205,76 @@ router.post("/:orderId/resend", async (req, res) => {
     if ((channel === "email" || channel === "both") && order.email) {
       await sendEmail({
         to: order.email,
-        subject: "🎉 Your EverMoment Download Link",
-        html: `
-          <h2>Your EverMoment is Ready ❤️</h2>
-          <p>You can download your video using the link below:</p>
-          <a href="${order.delivery_url}" target="_blank">
-            Download EverMoment
-          </a>
-        `,
+subject: "🎉 Your EverMoment Memory ✨ Is Ready To Relive",
+html: `
+  <div style="
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    padding: 32px;
+    background: #ffffff;
+    color: #111827;
+    line-height: 1.6;
+  ">
+    <h2 style="margin-bottom: 12px;">
+      Your EverMoment is Ready 🎉
+    </h2>
+
+    <p style="font-size: 15px; color: #374151;">
+      Your memories have been carefully crafted with attention, emotion,
+      and detail — and they’re now ready to be relived.
+    </p>
+
+    <div style="margin: 28px 0;">
+      <a
+        href="${downloadLink}"
+        target="_blank"
+        rel="noopener noreferrer"
+        style="
+          display: inline-block;
+          padding: 14px 28px;
+          background: #111827;
+          color: #ffffff;
+          text-decoration: none;
+          border-radius: 8px;
+          font-weight: 600;
+          letter-spacing: 0.2px;
+        "
+      >
+        ⬇️ Download Your EverMoment
+      </a>
+    </div>
+
+    <p style="font-size: 14px; color: #6b7280;">
+      This is your secure download link.
+      You can access it anytime after completing payment.
+    </p>
+
+    <hr style="
+      border: none;
+      border-top: 1px solid #e5e7eb;
+      margin: 32px 0;
+    " />
+
+    <p style="font-size: 15px; color: #374151;">
+      Thank you for trusting <strong>EverMoment</strong> to turn your
+      moments into memories that last.
+    </p>
+
+    <p style="font-size: 14px; color: #6b7280;">
+      If you have any questions or need assistance, feel free to reply to this email —
+      we’re always happy to help.
+    </p>
+
+    <p style="margin-top: 28px; font-size: 15px;">
+      With warmth,<br />
+      <strong>Team EverMoment</strong> 🤍
+    </p>
+
+    <p style="margin-top: 16px; font-size: 12px; color: #9ca3af;">
+      ⭐ Tip: Star this email to keep your download link handy for the future.
+    </p>
+  </div>
+`,
+
       });
     }
 

@@ -334,7 +334,9 @@ const data = await res.json();
           <textarea
             required
             className="w-full border-2 rounded-xl p-3"
-            placeholder="Tell us about this moment"
+            placeholder="Anything specific you want us to keep in mind? 🎵 Music preference
+🎭 Mood
+⏱ Pace"
             value={formData.specialBecause}
             onChange={e =>
               setFormData({ ...formData, specialBecause: e.target.value })
@@ -342,7 +344,7 @@ const data = await res.json();
           />
 
           {/* CONTACT */}
-          <input
+          {/* <input
             required
             className="w-full border-2 rounded-xl p-3"
             placeholder="Mobile number"
@@ -353,7 +355,25 @@ const data = await res.json();
                 whatsappNumber: e.target.value.replace(/\D/g, ""),
               })
             }
-          />
+          /> */}
+
+<input
+  required
+  type="tel"
+  inputMode="numeric"
+  pattern="[6-9][0-9]{9}"
+  maxLength={10}
+  className="w-full border-2 rounded-xl p-3"
+  placeholder="Mobile number (10 digits)"
+  value={formData.whatsappNumber}
+  onChange={(e) => {
+    const value = e.target.value.replace(/\D/g, "");
+    setFormData({
+      ...formData,
+      whatsappNumber: value.slice(0, 10),
+    });
+  }}
+/>
 
           <input
             required
@@ -367,14 +387,21 @@ const data = await res.json();
           />
 
           <Button type="submit" className="w-full" disabled={submitting}>
-            {submitting ? "Creating…" : "Submit My Moment"}
-          </Button>
+  <span className="flex items-center justify-center gap-2">
+    {submitting && (
+      <span
+        className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"
+        aria-hidden="true"
+      />
+    )}
+    {submitting ? "Please wait, creating your order…" : "Submit My Moment"}
+  </span>
+</Button>
+
         </form>
       </div>
     </div>
   );
-
-
 
 }
 

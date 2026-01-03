@@ -290,36 +290,69 @@ export default function AdminOrderDetailsPage() {
   /* ======================
      SEND PAYMENT LINK
      ====================== */
-  const sendPaymentLink = async () => {
-    try {
-      const res = await fetch(
-        `${API_BASE}/api/admin/orders/${order.id}/send-payment-link`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+//   const sendPaymentLink = async () => {
+//     try {
+//       const res = await fetch(
+//         `${API_BASE}/api/admin/orders/${order.id}/send-payment-link`,
+//         {
+//           method: "POST",
+//           headers: {
+//             "Content-Type": "application/json",
+//           },
+//         }
+//       );
 
-      // const data = await res.json();
-      if (!res.ok) {
-  throw new Error(`Payment API failed (${res.status})`);
-}
+//       // const data = await res.json();
+//       if (!res.ok) {
+//   throw new Error(`Payment API failed (${res.status})`);
+// }
 
-const data = await res.json();
+// const data = await res.json();
 
 
-      if (!res.ok) {
-        throw new Error(data.error || "Failed to send payment link");
+//       if (!res.ok) {
+//         throw new Error(data.error || "Failed to send payment link");
+//       }
+
+//       alert("Payment link sent successfully");
+//       router.refresh();
+//     } catch (err) {
+//       alert(err.message);
+//     }
+//   };
+
+const sendPaymentLink = async () => {
+  try {
+    const res = await fetch(
+      `${API_BASE}/api/admin/orders/${order.id}/send-payment-link`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
       }
+    );
 
-      alert("Payment link sent successfully");
-      router.refresh();
-    } catch (err) {
-      alert(err.message);
+    const data = await res.json();
+
+    if (!res.ok || !data?.emailSent) {
+      throw new Error(
+        data?.error || "Payment link email was not sent"
+      );
     }
-  };
+
+    alert("Payment link sent successfully");
+
+    // ✅ update local state immediately (no fake fade)
+    setOrder((prev) => ({
+      ...prev,
+      payment_link_sent: true,
+      status: "ready_for_payment",
+    }));
+  } catch (err) {
+    alert(err.message || "Failed to send payment link");
+  }
+};
+
+
 
   if (loading) {
     return (
@@ -343,8 +376,11 @@ const data = await res.json();
     order.status !== "paid" &&
     order.status !== "delivered";
 
-  const canSendPayment =
-    order.status === "uploaded" && order.payment_status !== "paid";
+  // const canSendPayment =
+  //   order.status === "uploaded" && order.payment_status !== "paid";
+const canSendPayment =
+  order.payment_status !== "paid" &&
+  !order.payment_link_sent;
 
   return (
     <div style={page}>
