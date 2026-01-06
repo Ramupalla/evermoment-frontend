@@ -306,6 +306,7 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import s3 from "../s3.js";
 
 import { sendEmail } from "../utils/sendEmail.js";
+
 import { sendOrderConfirmationEmail } from "../utils/sendOrderConfirmationEmail.js";
 
 const router = express.Router();

@@ -40,8 +40,10 @@ if (!API_BASE) {
 
       // const data = await res.json();
       if (!res.ok) {
-  throw new Error(`Payment API failed (${res.status})`);
-}
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || "Failed to send message");
+    }
+
 
 const data = await res.json();
 

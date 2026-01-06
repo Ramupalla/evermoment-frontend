@@ -555,7 +555,19 @@ export default function PaymentPage() {
   ======================= */
   return (
     <div style={page}>
-      <h1><strong>Unlock Your EverMoment</strong></h1>
+      
+
+      {derivedStatus === "ready_for_payment" && (
+        <h1 style={{ fontSize: "clamp(28px, 5vw, 36px)", fontWeight: 700, textAlign: "center" }}>
+        Unlock Your EverMoment🔒
+      </h1>
+      )}
+
+      {derivedStatus === "delivered" && (
+        <h1 style={{ fontSize: "clamp(28px, 5vw, 36px)", fontWeight: 700, textAlign: "center" }}>
+        You've Successfully Unlocked EverMoment🔓
+      </h1>
+      )}
 
       {/* ORDER SUMMARY */}
       <div style={summaryBox}>
@@ -583,7 +595,7 @@ export default function PaymentPage() {
 </div>
 
 
-        <div style={divider} />
+    <div style={divider} />
 
         <div style={summaryTotal}>
           <span>Total Amount</span>
@@ -635,10 +647,16 @@ export default function PaymentPage() {
         </button>
       )}
 
-      {paymentPaid && (
-        <p style={{ fontSize: "14px", opacity: 0.75 }}>
-          ✅ Payment already completed
-        </p>
+        {paymentPaid && (
+          <div style={thankYouBox}>
+      <p style={thankYouTitle}>
+        ✅ Payment successfully completed
+      </p>
+      <p style={thankYouText}>
+        Thank you for your trust.  
+        We’re delivering your EverMoment.
+      </p>
+      </div>
       )}
 
       <p style={{ fontSize: "12px", opacity: 0.6 }}>
@@ -700,6 +718,7 @@ const divider = {
 const timeline = {
   width: "100%",
   maxWidth: "160px",
+  
 };
 
 const stepRow = {
@@ -721,7 +740,7 @@ const line = {
   left: "5px",
   top: "12px",
   width: "2px",
-  height: "42px",
+  height: "50px",
 };
 
 const label = {
@@ -740,6 +759,33 @@ const btn = {
   cursor: "pointer",
   border: "none",
 };
+
+
+const thankYouBox = {
+  marginTop: "1px",
+  background: "rgba(189, 211, 197, 0.12)",
+  border: "3px solid rgba(39, 218, 101, 0.8)",
+  borderRadius: "14px",
+  padding: "20px 22px",
+  textAlign: "center",
+  maxWidth: "420px",
+  boxShadow: "0 0 0 6px rgba(10, 221, 88, 0.12)",
+
+};
+
+const thankYouTitle = {
+  fontSize: "15px",
+  fontWeight: 600,
+  marginBottom: "6px",
+  color: "#ecfdf5",
+};
+
+const thankYouText = {
+  fontSize: "13px",
+  opacity: 0.85,
+  lineHeight: 1.5,
+};
+
 
 /* =======================
    HELPERS

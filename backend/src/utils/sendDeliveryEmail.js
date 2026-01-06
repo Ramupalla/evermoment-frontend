@@ -204,10 +204,23 @@ html: `
       moments into memories that last.
     </p>
 
-    <p style="font-size: 14px; color: #6b7280;">
-      If you have any questions or need assistance, feel free to reply to this email —
-      we’re always happy to help.
-    </p>
+    <p style="margin-top: 24px; font-size: 14px; color: #6b7280;">
+  If you have any questions or need assistance, feel free to
+  <a
+    href="https://www.evermomentstudio.online/contact"
+    target="_blank"
+    rel="noopener noreferrer"
+    style="
+      color: #111827;
+      font-weight: 600;
+      text-decoration: underline;
+    "
+  >
+    send us a message
+  </a>
+  — we’re always happy to help.
+</p>
+
 
     <p style="margin-top: 28px; font-size: 15px;">
       With warmth,<br />

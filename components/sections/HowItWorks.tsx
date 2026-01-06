@@ -1,6 +1,13 @@
+
+"use client";
+
+import { useScrollReveal } from "@/lib/useScrollReveal";
+
 export default function HowItWorks() {
+  const revealRef = useScrollReveal();
   const steps = [
     {
+      
       number: '1',
       title: 'Share your video',
       description: 'Upload your raw footage and tell us what makes this moment special to you.',
@@ -23,7 +30,9 @@ export default function HowItWorks() {
   return (
     <section className="py-20 px-4 sm:px-6 lg:px-8 bg-soft-white section-fade bg-white py-24">
       <div className="max-w-7xl mx-auto">
-        <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-charcoal text-center mb-16">
+        <h2
+        ref={revealRef} 
+        className="reveal-on-scroll text-3xl sm:text-4xl md:text-5xl font-bold text-charcoal text-center mb-12">
           How It Works
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">

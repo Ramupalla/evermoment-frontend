@@ -1,4 +1,8 @@
 @import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 
 :root {
   --charcoal: #000000;
@@ -136,10 +140,24 @@ body::before {
   }
 }
 
+/* html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-white text-charcoal transition-colors duration-300;
+}
+
+.dark body {
+  @apply bg-[#0b1220] text-gray-100;
+}  */
+
 /* ======================
    UTILITY CLASSES
    ====================== */
 
+
+   
 .animate-slowFade {
   animation: slowFade 12s ease-in-out infinite;
 }
@@ -298,3 +316,70 @@ body {
     transform: translateY(0);
   }
 }
+
+
+/* =========================
+   EverMoment Premium Glow Button
+========================= */
+
+.glow-button {
+  position: relative;
+  background: #d4af37;
+  color: #1f1f1f;
+  font-weight: 600;
+  border-radius: 9999px;
+  transition: transform 0.3s ease;
+}
+
+/* Soft golden aura */
+.glow-button::before {
+  content: "";
+  position: absolute;
+  inset: -10px;
+  border-radius: inherit;
+  background: #d4af37;
+  filter: blur(25px);
+  opacity: 0.6;
+  z-index: -1;
+}
+
+/* Gentle breathing glow */
+@keyframes glowPulse {
+  0% {
+    box-shadow: 0 0 18px rgba(212, 175, 55, 0.45);
+  }
+  50% {
+    box-shadow: 0 0 36px rgba(212, 175, 55, 0.85);
+  }
+  100% {
+    box-shadow: 0 0 18px rgba(212, 175, 55, 0.45);
+  }
+}
+
+.glow-button {
+  animation: glowPulse 2.8s ease-in-out infinite;
+}
+
+.glow-button:hover {
+  transform: scale(1.05);
+}
+
+
+@keyframes blurReveal {
+  0% {
+    opacity: 0;
+    filter: blur(12px);
+    transform: translateY(14px);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+}
+
+.blur-reveal {
+  animation: blurReveal 0.9s ease-out forwards;
+  will-change: opacity, filter, transform;
+}
+

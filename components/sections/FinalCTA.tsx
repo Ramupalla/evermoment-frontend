@@ -14,9 +14,19 @@ export default function FinalCTA() {
         <p className="text-lg sm:text-xl text-gray-300 mb-10 leading-relaxed">
           Let&apos;s turn your moments into memories that last forever.
         </p>
-        <Button href="/create" size="lg" variant="secondary">
+        {/* <Button href="/create" size="lg" variant="secondary">
           Make This Moment Forever
-        </Button>
+        </Button> */}
+
+        <Button
+          href="/create"
+          size="lg"
+          variant="secondary"
+          
+          className="glow-button font-extrabold px-10 py-4 text-lg"
+        >
+          Make This Moment Forever
+      </Button>
       </div>
     </section>
   );

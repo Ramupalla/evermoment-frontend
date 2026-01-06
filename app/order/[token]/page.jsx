@@ -1126,10 +1126,460 @@
 
 // ##################################################################### 14:51 03-01-2026
 
+// "use client";
+
+// import { useEffect, useMemo, useState } from "react";
+// import { useParams, useRouter } from "next/navigation";
+
+// /* =======================
+//    CONFIG
+// ======================= */
+// const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL;
+// if (!API_BASE) {
+//   throw new Error("NEXT_PUBLIC_BACKEND_URL is missing");
+// }
+
+// /* =======================
+//    ORDER STEPS
+// ======================= */
+// const STEPS = [
+//   "created",
+//   "uploaded",
+//   "ready_for_payment",
+//   "paid",
+//   "delivered",
+// ];
+
+// export default function OrderStatusPage() {
+//   const params = useParams();
+//   const router = useRouter();
+
+//   // ✅ token normalization (SAFE)
+//   const token = useMemo(() => {
+//     if (!params?.token) return null;
+//     return Array.isArray(params.token)
+//       ? params.token[0]
+//       : params.token;
+//   }, [params]);
+
+//   const [data, setData] = useState(null);
+//   const [error, setError] = useState("");
+//   const [loading, setLoading] = useState(true);
+
+//   /* =======================
+//      FETCH ORDER (FIXED)
+//   ======================= */
+//   useEffect(() => {
+//     if (!token) return;
+
+//     const fetchOrder = async () => {
+//       try {
+//         setLoading(true);
+//         setError("");
+
+//         const res = await fetch(
+//           `${API_BASE}/api/orders/access/${token}`,
+//           { cache: "no-store" }
+//         );
+
+//         if (!res.ok) {
+//           const err = await res.json().catch(() => ({}));
+//           throw new Error(err.error || "Fetch failed");
+//         }
+
+//         const order = await res.json();
+
+//         // ✅ Defensive validation
+//         if (!order || !order.id) {
+//           throw new Error("Invalid order response");
+//         }
+
+//         console.log("ORDER DATA:", order);
+//         setData(order);
+//       } catch (err) {
+//         console.error("ORDER FETCH ERROR:", err);
+//         setError("Unable to fetch order status");
+//         setData(null);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     fetchOrder();
+//   }, [token]);
+
+//   /* =======================
+//      STATES
+//   ======================= */
+//   if (loading) {
+//     return (
+//       <div style={page}>
+//         <h2>Loading your EverMoment…</h2>
+//       </div>
+//     );
+//   }
+
+//   if (error) {
+//     return (
+//       <div style={page}>
+//         <h2>{error}</h2>
+//       </div>
+//     );
+//   }
+
+//   if (!data) {
+//     return (
+//       <div style={page}>
+//         <h2>Order not found</h2>
+//       </div>
+//     );
+//   }
+
+//   /* =======================
+//      NORMALIZED VALUES
+//   ======================= */
+//   const fastTrackEnabled = Boolean(Number(data.fastTrack));
+//   const fastTrackAmount = Number(data.fast_track_amount || 0);
+//   const baseAmount = Number(data.base_amount || 0);
+//   const totalAmount = Number(
+//     data.amount || baseAmount + fastTrackAmount
+//   );
+
+//   const derivedStatus =
+//     data.delivery_unlocked
+//       ? "delivered"
+//       : data.payment_status === "paid"
+//       ? "paid"
+//       : data.status;
+
+//   const currentIndex = STEPS.indexOf(derivedStatus);
+
+// /* 👇 ADD IT RIGHT HERE */
+// console.log("PAYMENT LINK STATE:", {
+//   status: data.status,
+//   payment_link_sent: data.payment_link_sent,
+// });
+
+//   /* =======================
+//      UI (UNCHANGED)
+//   ======================= */
+//   return (
+//     <div style={page}>
+//       <h1 style={{ fontSize: "clamp(28px, 5vw, 36px)", fontWeight: 700 }}>
+//         Your EverMoment
+//       </h1>
+
+//       <p style={statusText}>
+//         <strong>
+//           🎉 Your order is {humanize(derivedStatus)} successfully!
+//         </strong>
+//       </p>
+
+//       {/* ORDER SUMMARY */}
+//       <div style={summaryBox}>
+//         <div style={summaryRow}>
+//           <span><strong>Plan</strong></span>
+//           <span>{humanize(data.plan)} — ₹{baseAmount}</span>
+//         </div>
+
+//         <div style={summaryRow}>
+//           <span><strong>Fast Track</strong></span>
+//           <span>{fastTrackEnabled ? "Yes ⚡" : "No"}</span>
+//         </div>
+
+//         {/* {fastTrackEnabled && fastTrackAmount > 0 && (
+//           <div style={summaryRowMuted}>
+//             <span>Fast Track Add-on</span>
+//             <span>₹{fastTrackAmount}</span>
+//           </div>
+//         )} */}
+
+// <div style={summaryRowMuted}>
+//   <span>Add-on Fast Track Charges</span>
+//   <span>
+//     ₹{data.fastTrack ? data.fast_track_amount : 0}
+//   </span>
+// </div>
+//         <div style={divider} />
+
+//         <div style={summaryTotal}>
+//           <span>Total Amount</span>
+//           <span>₹{totalAmount}</span>
+//         </div>
+//       </div>
+
+//       <p style={{ fontSize: 14, opacity: 0.65 }}>
+//         You’ll receive email confirmation shortly…
+//       </p>
+
+//       {/* TIMELINE */}
+//       <div style={timeline}>
+//         {STEPS.map((step, idx) => {
+//           const isActive = idx <= currentIndex;
+//           const isLast = idx === STEPS.length - 1;
+
+//           return (
+//             <div key={step} style={stepRow}>
+//               <div style={{ position: "relative" }}>
+//                 <div
+//                   style={{
+//                     ...dot,
+//                     background: isActive ? "#22c55e" : "#334155",
+//                   }}
+//                 />
+//                 {!isLast && (
+//                   <div
+//                     style={{
+//                       ...line,
+//                       ...(idx < currentIndex ? activeLine : {}),
+//                     }}
+//                   />
+//                 )}
+//               </div>
+
+//               <span
+//                 style={{
+//                   ...label,
+//                   opacity: isActive ? 1 : 0.6,
+//                 }}
+//               >
+//                 {humanize(step)}
+//               </span>
+//             </div>
+//           );
+//         })}
+//       </div>
+
+      
+// {derivedStatus === "created" && (
+//   <div style={thankYouBox}>
+//     <p style={thankYouTitle}>
+//       Thank you for trusting EverMoment 🤍
+//     </p>
+
+//     <p style={thankYouText}>
+//       We’re excited to turn your moments into something truly special.
+//     </p>
+//   </div>
+// )}
+
+
+// {/* {derivedStatus === "created" && (
+//   <p
+//     style={{
+//       marginTop: "32px",
+//       fontSize: "14px",
+//       textAlign: "center",
+//       opacity: 0.75,
+//       lineHeight: 1.6,
+//     }}
+//   >
+//     <strong>Thank you for trusting EverMoment 🤍</strong>
+//     <br />
+//     We’re excited to turn your moments into something truly special.
+//   </p>
+// )} */}
+
+
+
+//       {/* 📩 BIG DELIVERY REMINDER */}
+//       {data.delivery_unlocked && (
+//   <div style={reminderBox}>
+//     <h2 style={{ marginBottom: "6px" }}>
+//       🎉 Your EverMoment is Ready!
+//     </h2>
+
+//     <p style={{ fontSize: "15px", lineHeight: 1.6 }}>
+//       <strong>
+//         Download link has been sent to your
+//       </strong>
+//       <br />
+//       📧 <b>Email</b>
+//     </p>
+
+//     <p style={{ fontSize: "13px", opacity: 0.8 }}>
+//       You can download now or check your inbox anytime.
+//     </p>
+//   </div>
+// )}
+
+
+//       {/* {data.status === "ready_for_payment" && (
+//         <button
+//           style={primaryBtn}
+//           onClick={() => router.push(`/payment/${token}`)}
+//         >
+//           Pay & Unlock Your Video
+//         </button>
+//       )} */}
+
+//       {data.delivery_unlocked && (
+//         <a
+//           href={`${API_BASE}/api/orders/${token}/download`}
+//           style={downloadBtn}
+//         >
+//           ⬇️ Download Your EverMoment
+//         </a>
+//       )}
+//     </div>
+//   );
+// }
+
+// /* =======================
+//    HELPERS
+// ======================= */
+// function humanize(s) {
+//   return typeof s === "string"
+//     ? s.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())
+//     : "";
+// }
+
+// /* =======================
+//    STYLES (UNCHANGED)
+// ======================= */
+
+// const page = {
+//   minHeight: "100vh",
+//   background: "#0f172a",
+//   color: "#fff",
+//   display: "flex",
+//   flexDirection: "column",
+//   alignItems: "center",
+//   justifyContent: "center",
+//   gap: "24px",
+//   padding: "16px",
+// };
+
+// const summaryBox = {
+//   border: "1px solid #334155",
+//   padding: "24px 28px",
+//   borderRadius: "18px",
+//   boxShadow: "0 30px 80px rgba(116,108,108,0.45)",
+//   width: "100%",
+//   maxWidth: "360px",
+// };
+
+// const summaryRow = {
+//   display: "flex",
+//   justifyContent: "space-between",
+//   marginBottom: 8,
+// };
+
+// const summaryRowMuted = {
+//   ...summaryRow,
+//   opacity: 0.75,
+// };
+
+// const summaryTotal = {
+//   display: "flex",
+//   justifyContent: "space-between",
+//   fontSize: 18,
+//   fontWeight: 600,
+// };
+
+// const divider = {
+//   height: 1,
+//   background: "#334155",
+//   margin: "12px 0",
+// };
+
+// const statusText = {
+//   fontSize: 20,
+// };
+
+// const timeline = {
+//   display: "flex",
+//   flexDirection: "column",
+//   gap: 16,
+// };
+
+// const stepRow = {
+//   display: "flex",
+//   alignItems: "center",
+//   gap: 16,
+// };
+
+// const dot = {
+//   width: 12,
+//   height: 12,
+//   borderRadius: "50%",
+// };
+
+// const line = {
+//   position: "absolute",
+//   left: 5,
+//   top: 14,
+//   bottom: "-70px",
+//   width: 2,
+//   background: "#334155",
+// };
+
+// const activeLine = {
+//   background: "#22c55e",
+// };
+
+// const label = {
+//   fontSize: 14,
+// };
+
+// const primaryBtn = {
+//   padding: "14px 24px",
+//   borderRadius: "10px",
+// };
+
+// const downloadBtn = {
+//   padding: "14px 24px",
+//   borderRadius: "10px",
+//   background: "#22c55e",
+//   textDecoration: "none",
+// };
+
+// const reminderBox = {
+//   marginTop: "10px",
+//   border: "1px solid #22c55e",
+//   background: "rgba(34,197,94,0.08)",
+//   borderRadius: "14px",
+//   padding: "20px 22px",
+//   textAlign: "center",
+//   maxWidth: "420px",
+//   boxShadow: "0 0 0 6px rgba(34,197,94,0.12)",
+// };
+
+
+// const thankYouBox = {
+//   marginTop: "10px",
+//   background: "rgba(34,197,94,0.12)", // ⬆ brighter background
+//   border: "1px solid rgba(34,197,94,0.8)", // ⬆ stronger border
+//   borderRadius: "14px",
+//   padding: "20px 22px",
+//   textAlign: "center",
+//   maxWidth: "420px",
+//   boxShadow: "0 0 0 6px rgba(34,197,94,0.12)",
+//   animation: "softFadeUp 0.6s ease-out both",
+// };
+
+// const thankYouTitle = {
+//   fontSize: "15px",
+//   fontWeight: 600,
+//   marginBottom: "6px",
+//   // color: "#dcf6fcff",
+//   color: "#ecfdf5",
+// };
+
+// const thankYouText = {
+//   fontSize: "13px",
+//   opacity: 0.85,
+//   lineHeight: 1.5,
+// };
+
+
+// ##################################################################### 15:13 04-01-2026
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { getFiles, clearFiles } from "@/app/fileStore";
+
 
 /* =======================
    CONFIG
@@ -1154,7 +1604,7 @@ export default function OrderStatusPage() {
   const params = useParams();
   const router = useRouter();
 
-  // ✅ token normalization (SAFE)
+  /* ✅ SAFE TOKEN NORMALIZATION */
   const token = useMemo(() => {
     if (!params?.token) return null;
     return Array.isArray(params.token)
@@ -1167,7 +1617,7 @@ export default function OrderStatusPage() {
   const [loading, setLoading] = useState(true);
 
   /* =======================
-     FETCH ORDER (FIXED)
+     FETCH ORDER
   ======================= */
   useEffect(() => {
     if (!token) return;
@@ -1184,17 +1634,15 @@ export default function OrderStatusPage() {
 
         if (!res.ok) {
           const err = await res.json().catch(() => ({}));
-          throw new Error(err.error || "Fetch failed");
+          throw new Error(err.error || "Failed to fetch order");
         }
 
         const order = await res.json();
 
-        // ✅ Defensive validation
         if (!order || !order.id) {
           throw new Error("Invalid order response");
         }
 
-        console.log("ORDER DATA:", order);
         setData(order);
       } catch (err) {
         console.error("ORDER FETCH ERROR:", err);
@@ -1207,6 +1655,63 @@ export default function OrderStatusPage() {
 
     fetchOrder();
   }, [token]);
+
+
+  useEffect(() => {
+  if (!data || data.status !== "created") return;
+
+  const uploadPendingFiles = async () => {
+    try {
+      const files = await getFiles(token);
+      if (!files.length) return;
+
+      const uploaded = [];
+
+      for (const file of files) {
+        const presignRes = await fetch(`${API_BASE}/api/uploads/presign`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            orderId: data.id,
+            fileName: file.name,
+            fileType: file.type,
+          }),
+        });
+
+        const { uploadUrl, key } = await presignRes.json();
+
+        await fetch(uploadUrl, {
+          method: "PUT",
+          headers: { "Content-Type": file.type },
+          body: file,
+        });
+
+        uploaded.push({
+          key,
+          type: file.type.startsWith("video") ? "video" : "image",
+          originalName: file.name,
+        });
+      }
+
+      await fetch(`${API_BASE}/api/uploads/complete`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          orderId: data.id,
+          files: uploaded,
+        }),
+      });
+
+      // 🧹 cleanup after success
+      await clearFiles(token);
+
+    } catch (err) {
+      console.error("BACKGROUND UPLOAD FAILED:", err);
+    }
+  };
+
+  uploadPendingFiles();
+}, [data]);
 
   /* =======================
      STATES
@@ -1241,9 +1746,7 @@ export default function OrderStatusPage() {
   const fastTrackEnabled = Boolean(Number(data.fastTrack));
   const fastTrackAmount = Number(data.fast_track_amount || 0);
   const baseAmount = Number(data.base_amount || 0);
-  const totalAmount = Number(
-    data.amount || baseAmount + fastTrackAmount
-  );
+  const totalAmount = Number(data.amount || baseAmount + fastTrackAmount);
 
   const derivedStatus =
     data.delivery_unlocked
@@ -1254,14 +1757,8 @@ export default function OrderStatusPage() {
 
   const currentIndex = STEPS.indexOf(derivedStatus);
 
-/* 👇 ADD IT RIGHT HERE */
-console.log("PAYMENT LINK STATE:", {
-  status: data.status,
-  payment_link_sent: data.payment_link_sent,
-});
-
   /* =======================
-     UI (UNCHANGED)
+     UI
   ======================= */
   return (
     <div style={page}>
@@ -1269,11 +1766,27 @@ console.log("PAYMENT LINK STATE:", {
         Your EverMoment
       </h1>
 
-      <p style={statusText}>
+      {derivedStatus === "created" && (
+        <p style={statusText}>
         <strong>
-          🎉 Your order is {humanize(derivedStatus)} successfully!
+          🎉 Your Order Is {humanize(derivedStatus)} Successfully!
         </strong>
-      </p>
+      </p>  
+      )}
+      {derivedStatus === "uploaded" && (
+        <p style={statusText}>
+        <strong>
+          🎉 Your Final Memory Is {humanize(derivedStatus)} Successfully!
+        </strong>
+      </p>  
+      )}
+      {derivedStatus === "ready_for_payment" && (
+        <p style={statusText}>
+        <strong>
+          🎉 Your order is {humanize(derivedStatus)}!
+        </strong>
+      </p>  
+      )}
 
       {/* ORDER SUMMARY */}
       <div style={summaryBox}>
@@ -1287,19 +1800,11 @@ console.log("PAYMENT LINK STATE:", {
           <span>{fastTrackEnabled ? "Yes ⚡" : "No"}</span>
         </div>
 
-        {/* {fastTrackEnabled && fastTrackAmount > 0 && (
-          <div style={summaryRowMuted}>
-            <span>Fast Track Add-on</span>
-            <span>₹{fastTrackAmount}</span>
-          </div>
-        )} */}
+        <div style={summaryRowMuted}>
+          <span>Add-on Fast Track Charges</span>
+          <span>₹{fastTrackEnabled ? fastTrackAmount : 0}</span>
+        </div>
 
-<div style={summaryRowMuted}>
-  <span>Add-on Fast Track Charges</span>
-  <span>
-    ₹{data.fastTrack ? data.fast_track_amount : 0}
-  </span>
-</div>
         <div style={divider} />
 
         <div style={summaryTotal}>
@@ -1307,10 +1812,12 @@ console.log("PAYMENT LINK STATE:", {
           <span>₹{totalAmount}</span>
         </div>
       </div>
-
+      
+    {derivedStatus === "created" && (
       <p style={{ fontSize: 14, opacity: 0.65 }}>
-        You’ll receive email confirmation shortly…
+            You’ll receive email confirmation shortly…
       </p>
+      )}
 
       {/* TIMELINE */}
       <div style={timeline}>
@@ -1349,70 +1856,61 @@ console.log("PAYMENT LINK STATE:", {
           );
         })}
       </div>
+{/* THANK YOU MESSAGE */}
 
-      
 {derivedStatus === "created" && (
   <div style={thankYouBox}>
     <p style={thankYouTitle}>
       Thank you for trusting EverMoment 🤍
     </p>
-
     <p style={thankYouText}>
-      We’re excited to turn your moments into something truly special.
+      Your order is confirmed.  
+      Our team is getting ready to craft your moments with care and emotion.
     </p>
   </div>
 )}
 
 
-{/* {derivedStatus === "created" && (
-  <p
-    style={{
-      marginTop: "32px",
-      fontSize: "14px",
-      textAlign: "center",
-      opacity: 0.75,
-      lineHeight: 1.6,
-    }}
-  >
-    <strong>Thank you for trusting EverMoment 🤍</strong>
-    <br />
-    We’re excited to turn your moments into something truly special.
-  </p>
-)} */}
+{derivedStatus === "uploaded" && (
+  <div style={thankYouBox}>
+    <p style={thankYouTitle}>
+      Your moments crafted together ✨
+    </p>
+    <p style={thankYouText}>
+      We’ve received your files.  
+      Done editing, and something beautiful is on its way.
+    </p>
+  </div>
+)}
+
+{derivedStatus === "ready_for_payment" && (
+  <div style={thankYouBox}>
+    <p style={thankYouTitle}>
+      Your EverMoment is almost ready 🎬
+    </p>
+    <p style={thankYouText}>
+      Your final video is prepared.  
+      Complete the payment to unlock and relive your special memory.
+    </p>
+  </div>
+)}
 
 
-
-      {/* 📩 BIG DELIVERY REMINDER */}
+      {/* DELIVERY REMINDER */}
       {data.delivery_unlocked && (
-  <div style={reminderBox}>
-    <h2 style={{ marginBottom: "6px" }}>
-      🎉 Your EverMoment is Ready!
-    </h2>
+        <div style={reminderBox}>
+          <h2 style={{ marginBottom: 6 }}>🎉 Hurray!!! Your EverMoment is Ready!</h2>
+          <p style={{ fontSize: 15 }}>
+            <strong>Download link has been sent to your</strong><br />
+            📧 <b>Email</b>
+          </p>
+          <p style={{ fontSize: 13, opacity: 0.8 }}>
+            You can download now or check your inbox anytime.
+          </p>
+        </div>
+      )}
 
-    <p style={{ fontSize: "15px", lineHeight: 1.6 }}>
-      <strong>
-        Download link has been sent to your
-      </strong>
-      <br />
-      📧 <b>Email</b>
-    </p>
-
-    <p style={{ fontSize: "13px", opacity: 0.8 }}>
-      You can download now or check your inbox anytime.
-    </p>
-  </div>
-)}
-
-
-      {/* {data.status === "ready_for_payment" && (
-        <button
-          style={primaryBtn}
-          onClick={() => router.push(`/payment/${token}`)}
-        >
-          Pay & Unlock Your Video
-        </button>
-      )} */}
-
+      {/* DOWNLOAD */}
       {data.delivery_unlocked && (
         <a
           href={`${API_BASE}/api/orders/${token}/download`}
@@ -1435,7 +1933,7 @@ function humanize(s) {
 }
 
 /* =======================
-   STYLES (UNCHANGED)
+   STYLES
 ======================= */
 
 const page = {
@@ -1483,9 +1981,7 @@ const divider = {
   margin: "12px 0",
 };
 
-const statusText = {
-  fontSize: 20,
-};
+const statusText = { fontSize: 20, textAlign: "center", };
 
 const timeline = {
   display: "flex",
@@ -1509,7 +2005,7 @@ const line = {
   position: "absolute",
   left: 5,
   top: 14,
-  bottom: "-70px",
+  bottom: "-75px",
   width: 2,
   background: "#334155",
 };
@@ -1518,14 +2014,7 @@ const activeLine = {
   background: "#22c55e",
 };
 
-const label = {
-  fontSize: 14,
-};
-
-const primaryBtn = {
-  padding: "14px 24px",
-  borderRadius: "10px",
-};
+const label = { fontSize: 14 };
 
 const downloadBtn = {
   padding: "14px 24px",
@@ -1545,24 +2034,22 @@ const reminderBox = {
   boxShadow: "0 0 0 6px rgba(34,197,94,0.12)",
 };
 
-
 const thankYouBox = {
   marginTop: "10px",
-  background: "rgba(34,197,94,0.12)", // ⬆ brighter background
-  border: "1px solid rgba(34,197,94,0.8)", // ⬆ stronger border
+  background: "rgba(189, 211, 197, 0.12)",
+  border: "3px solid rgba(39, 218, 101, 0.8)",
   borderRadius: "14px",
   padding: "20px 22px",
   textAlign: "center",
   maxWidth: "420px",
-  boxShadow: "0 0 0 6px rgba(34,197,94,0.12)",
-  animation: "softFadeUp 0.6s ease-out both",
+  boxShadow: "0 0 0 6px rgba(10, 221, 88, 0.12)",
+
 };
 
 const thankYouTitle = {
   fontSize: "15px",
   fontWeight: 600,
   marginBottom: "6px",
-  // color: "#dcf6fcff",
   color: "#ecfdf5",
 };
 
