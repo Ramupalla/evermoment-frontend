@@ -74,7 +74,6 @@
 
 // export default app;
 // #---------------------------------------------------- above code works locally
-
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -90,32 +89,25 @@ dotenv.config();
 const app = express();
 
 /* =========================
-   CORS (PRODUCTION SAFE)
+   GLOBAL MIDDLEWARE
 ========================= */
-const allowedOrigins = [
-  "https://www.evermomentstudio.online",
-  "https://evermomentstudio.online",
-  "http://localhost:3000",
-];
 
+// ✅ SAFE CORS (Node 22 compatible)
 app.use(
   cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
+    origin: [
+      "https://www.evermomentstudio.online",
+      "https://evermoment-frontend-ofla.vercel.app",
+      "https://evermoment-frontend-jvs5.vercel.app",
+      "http://localhost:3000",
+    ],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "x-admin-secret"],
     credentials: true,
   })
 );
 
-/* ✅ IMPORTANT: FIX FOR NODE 22 */
-app.options("/*", cors());
-
+// ✅ JSON parsing
 app.use(express.json());
 
 /* =========================
@@ -145,7 +137,6 @@ app.use((req, res) => {
    START SERVER
 ========================= */
 const PORT = process.env.PORT || 5000;
-
 app.listen(PORT, () => {
   console.log(`🚀 EverMoment backend running on port ${PORT}`);
 });
