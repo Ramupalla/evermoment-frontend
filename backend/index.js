@@ -75,7 +75,6 @@
 // export default app;
 // #---------------------------------------------------- above code works locally
 
-
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -91,43 +90,32 @@ dotenv.config();
 const app = express();
 
 /* =========================
-   GLOBAL MIDDLEWARE
+   CORS (PRODUCTION SAFE)
 ========================= */
-
-// 🔐 Allowed origins (env-driven)
 const allowedOrigins = [
-  process.env.FRONTEND_URL,
-  "http://localhost:3000", // local dev
-].filter(Boolean);
+  "https://www.evermomentstudio.online",
+  "https://evermomentstudio.online",
+  "http://localhost:3000",
+];
 
-// ✅ CORS (PRODUCTION SAFE)
 app.use(
   cors({
-    origin: (origin, callback) => {
-      // allow server-to-server, curl, postman
-      if (!origin) return callback(null, true);
-
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
       }
-
-      console.error("❌ Blocked by CORS:", origin);
-      return callback(new Error("Not allowed by CORS"));
     },
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: [
-      "Content-Type",
-      "Authorization",
-      "x-admin-secret",
-    ],
+    allowedHeaders: ["Content-Type", "Authorization", "x-admin-secret"],
     credentials: true,
   })
 );
 
-// ✅ REQUIRED: handle preflight requests
-app.options("*", cors());
+/* ✅ IMPORTANT: FIX FOR NODE 22 */
+app.options("/*", cors());
 
-// ✅ JSON body parsing
 app.use(express.json());
 
 /* =========================
@@ -138,16 +126,12 @@ app.get("/", (req, res) => {
 });
 
 /* =========================
-   PUBLIC ROUTES
+   ROUTES
 ========================= */
 app.use("/api/orders", ordersRouter);
 app.use("/api/uploads", uploadRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/contact", contactRoutes);
-
-/* =========================
-   ADMIN ROUTES
-========================= */
 app.use("/api/admin/orders", adminOrdersRouter);
 
 /* =========================
