@@ -32,7 +32,9 @@ export default function HowItWorks() {
       <div className="max-w-7xl mx-auto">
         <h2
         ref={revealRef} 
-        className="reveal-on-scroll text-3xl sm:text-4xl md:text-5xl font-bold text-charcoal text-center mb-12">
+        className="reveal-on-scroll text-3xl sm:text-4xl md:text-5xl font-bold text-charcoal text-center mb-12"
+        // style={{ animationDelay: "0.15s" }}
+        >
           How It Works
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">

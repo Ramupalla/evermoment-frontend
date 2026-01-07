@@ -1874,7 +1874,7 @@ export default function OrderStatusPage() {
 {derivedStatus === "uploaded" && (
   <div style={thankYouBox}>
     <p style={thankYouTitle}>
-      Your moments crafted together ✨
+      Your moments are crafted together ✨
     </p>
     <p style={thankYouText}>
       We’ve received your files.  
@@ -1885,7 +1885,7 @@ export default function OrderStatusPage() {
 
 {derivedStatus === "ready_for_payment" && (
   <div style={thankYouBox}>
-    <p style={thankYouTitle}>
+    <p  style={thankYouTitle}>
       Your EverMoment is almost ready 🎬
     </p>
     <p style={thankYouText}>
@@ -1899,7 +1899,7 @@ export default function OrderStatusPage() {
       {/* DELIVERY REMINDER */}
       {data.delivery_unlocked && (
         <div style={reminderBox}>
-          <h2 style={{ marginBottom: 6 }}>🎉 Hurray!!! Your EverMoment is Ready!</h2>
+          <h2 style={{ marginBottom: 6 }}>🎉 Hurray!!! Your EverMoment is Unlocked!</h2>
           <p style={{ fontSize: 15 }}>
             <strong>Download link has been sent to your</strong><br />
             📧 <b>Email</b>

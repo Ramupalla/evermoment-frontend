@@ -9,7 +9,7 @@ export default function Footer() {
 
           {/* Brand */}
           <div>
-            <h3 className="text-xl font-bold mb-4">EverMoment Studio</h3>
+            <h3 className="text-xl font-bold mb-4">EverMoment <span className="text-[#d4af37]">Studio</span></h3>
             <p className="text-gray-300 text-sm">
               Turning every moment into beautiful memory💖.
             </p>

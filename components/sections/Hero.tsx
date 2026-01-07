@@ -72,7 +72,9 @@ export default function Hero() {
       <div className="relative z-20 max-w-7xl mx-auto text-center">
         <h1 
         ref={revealRef}
-        className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
+        className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight"
+        style={{ animationDelay: "0.15s" }}
+        >
           Your moments,<br />
           beautifully crafted together.
         </h1>

@@ -27,14 +27,16 @@ export default function WhyEverMoment() {
       <div className="max-w-7xl mx-auto">
         <h2 
         ref={revealRef}
-        className="reveal-on-scroll text-3xl sm:text-4xl md:text-5xl font-bold text-charcoal text-center mb-12" >
+        className="reveal-on-scroll text-3xl sm:text-4xl md:text-5xl font-bold text-charcoal text-center mb-12" 
+        // style={{ animationDelay: "0.15s" }}
+        >
           Why EverMoment
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
           {features.map((feature, index) => (
             <div
               key={index}
-              className="bg-soft-blue  rounded-2xl p-8 text-center hover:shadow-xl transition-all duration-300 hover:scale-120"
+              className="bg-soft-white  rounded-2xl p-8 text-center hover:shadow-xl transition-all duration-300 hover:scale-120"
             >
               <div className="text-5xl mb-4">{feature.icon}</div>
               <h3 className="text-xl font-bold text-charcoal mb-4">{feature.title}</h3>

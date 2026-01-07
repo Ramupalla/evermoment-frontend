@@ -383,3 +383,8 @@ body {
   will-change: opacity, filter, transform;
 }
 
+
+.reveal-on-scroll {
+  opacity: 0;
+}
+

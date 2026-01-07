@@ -1,5 +1,3 @@
-// =================================================
-
 "use client";
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
@@ -197,18 +195,20 @@ const canSendPayment =
       <h1>Order Details</h1>
 
       <Section title="Order Info">
-        <Row label="Order ID" value={order.id} />
-        <Row label="Plan" value={order.plan} />
-        <Row label="Amount" value={`₹${order.amount}`} />
-        <Row label="Access Token" value={order.access_token} mono />
-        <Row
-          label="Created At"
-          value={new Date(order.created_at).toLocaleString("en-IN", {
-            dateStyle: "medium",
-            timeStyle: "short",
-          })}
-        />
-      </Section>
+  <Row label="Order ID" value={order.id} />
+  <Row label="Plan" value={order.plan} />
+  <Row label="Amount" value={`₹${order.amount}`} />
+  <Row label="Access Token" value={order.access_token} mono />
+  <Row
+    label="Created At"
+    value={new Date(order.created_at).toLocaleString("en-IN", {
+      timeZone: "Asia/Kolkata",
+      dateStyle: "medium",
+      timeStyle: "short",
+    })}
+  />
+</Section>
+
 
       <Section title="Status">
         <Row label="Order Status" value={order.status} />

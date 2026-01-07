@@ -129,9 +129,7 @@ export async function sendDeliveryEmail({ email, token }) {
   /* =========================
      BASE URL (PUBLIC ONLY)
   ========================= */
-  const BASE_URL =
-    process.env.PUBLIC_SITE_URL?.trim() ||
-    process.env.BACKEND_URL?.trim();
+  const BASE_URL = process.env.BACKEND_URL?.trim();
 
   if (!BASE_URL) {
     throw new Error(
@@ -160,7 +158,7 @@ html: `
     line-height: 1.6;
   ">
     <h2 style="margin-bottom: 12px;">
-      Your EverMoment is Ready 🎉
+      Your EverMoment is Unlocked 🎉
     </h2>
 
     <p style="font-size: 15px; color: #374151;">

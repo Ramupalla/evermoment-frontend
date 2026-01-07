@@ -84,10 +84,16 @@ export default function OurWorks() {
         
         <h2 
         ref={revealRef} 
-        className="reveal-on-scroll text-3xl sm:text-4xl md:text-5xl font-bold text-charcoal text-center mb-12">
+        className="reveal-on-scroll text-3xl sm:text-4xl md:text-5xl font-bold text-charcoal text-center mb-12"
+        // style={{ animationDelay: "0.15s" }}
+        >
           Our Works
         </h2>
-        <p className="reveal-on-scroll font-bold text-charcoal text-center mb-12 text-gray-600 mb-16 text-lg">
+        <p 
+        // ref={revealRef} 
+        className="reveal-on-scroll font-bold text-charcoal text-center mb-12 text-gray-600 mb-16 text-lg"
+        // style={{ animationDelay: "0.15s" }}
+        >
           memories we&apos;ve crafted
         </p>
 
