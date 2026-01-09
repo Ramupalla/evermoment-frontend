@@ -212,6 +212,22 @@ const data = await res.json();
         <div className="mt-16 flex flex-col sm:flex-row items-center justify-center gap-6">
           {/* Instagram */}
           <a
+            href="https://www.instagram.com/ramu_elite.0209?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-3 bg-white px-6 py-4 rounded-2xl shadow-md hover:shadow-lg transition"
+          >
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center text-2xl">
+              📸
+            </div>
+            <div className="text-left">
+              <p className="text-sm text-gray-500">Instagram</p>
+              <p className="text-lg font-semibold text-charcoal">@ramu_elite.0209</p>
+            </div>
+          </a>
+
+
+          <a
             href="https://www.instagram.com/evermoment_studio?igsh=dzZ6aXN0OHdwOGli"
             target="_blank"
             rel="noopener noreferrer"

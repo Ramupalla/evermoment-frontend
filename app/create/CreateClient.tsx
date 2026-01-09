@@ -680,21 +680,21 @@
 //       const { accessToken } = await res.json();
 
 //       // 2️⃣ Save files to IndexedDB
-//       if (uploadedFiles.length > 0) {
-//         await saveFiles(
-//           accessToken,
-//           uploadedFiles.map(f => f.file)
-//         );
-//       }
+  //     if (uploadedFiles.length > 0) {
+  //       await saveFiles(
+  //         accessToken,
+  //         uploadedFiles.map(f => f.file)
+  //       );
+  //     }
 
-//       // 3️⃣ Redirect immediately
-//       router.push(`/order/${accessToken}`);
-//     } catch (err: any) {
-//       alert(err.message || "Something went wrong");
-//     } finally {
-//       setSubmitting(false);
-//     }
-//   };
+  //     // 3️⃣ Redirect immediately
+  //     router.push(`/order/${accessToken}`);
+  //   } catch (err: any) {
+  //     alert(err.message || "Something went wrong");
+  //   } finally {
+  //     setSubmitting(false);
+  //   }
+  // };
 
 //   /* ================= UI ================= */
 
@@ -900,6 +900,8 @@
 
 
 // #------------------------------------------
+
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -909,10 +911,11 @@ import Button from "@/components/Button";
 
 const FAST_TRACK_UI_ENABLED = true;
 
+
 const PLANS = [
-  { id: "story", name: "Story / Status", price: 149, duration: "Up to 1 minute" },
-  { id: "basic", name: "Beautiful Moments", price: 399, duration: "Up to 3 minutes" },
-  { id: "premium", name: "Premium Moments", price: 799, duration: "Up to 10 minutes" },
+  { id: "story", name: "Story / Status", price: 75, duration: "Up to 1 minute" },
+  { id: "basic", name: "Beautiful Moments", price: 199, duration: "Up to 3 minutes" },
+  { id: "premium", name: "Premium Moments", price: 399, duration: "Up to 10 minutes" },
 ];
 
 type UploadedFile = {

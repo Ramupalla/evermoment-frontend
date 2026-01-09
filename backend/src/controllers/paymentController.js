@@ -207,11 +207,25 @@ export const createOrder = async (req, res) => {
       return res.status(404).json({ error: "Order not found" });
     }
 
-    const razorpayOrder = await razorpay.orders.create({
-      amount: order.amount * 100, // paise
-      currency: "INR",
-      receipt: `ord_${orderId.slice(0, 8)}`,
-    });
+    // const razorpayOrder = await razorpay.orders.create({
+    //   amount: order.amount * 100, // paise
+    //   currency: "INR",
+    //   receipt: `ord_${orderId.slice(0, 8)}`,
+    // });
+
+// ✅ Determine payable amount (test vs real)
+let payableAmount = order.amount;
+
+if (process.env.PAYMENT_TEST_MODE === "true") {
+  payableAmount = Number(process.env.PAYMENT_TEST_AMOUNT || 1);
+}
+
+const razorpayOrder = await razorpay.orders.create({
+  amount: payableAmount * 100, // paise
+  currency: "INR",
+  receipt: `ord_${orderId.slice(0, 8)}`,
+});
+
 
     return res.json({
       razorpayOrderId: razorpayOrder.id,

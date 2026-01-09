@@ -83,6 +83,8 @@ import uploadRoutes from "./src/routes/uploads.js";
 import paymentRoutes from "./src/routes/payments.js";
 import adminOrdersRouter from "./src/routes/adminOrders.js";
 import contactRoutes from "./src/routes/contact.js";
+import razorpayWebhook from "./src/routes/razorpayWebhook.js";
+
 
 dotenv.config();
 
@@ -125,6 +127,7 @@ app.use("/api/uploads", uploadRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/admin/orders", adminOrdersRouter);
+app.use("/api/webhooks", razorpayWebhook);
 
 /* =========================
    404 FALLBACK

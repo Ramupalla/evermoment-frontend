@@ -1,18 +1,111 @@
+// import express from "express";
+// import { PutObjectCommand } from "@aws-sdk/client-s3";
+// import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+// import { randomUUID } from "crypto";
+// import s3 from "../s3.js";
+// import pool from "../db.js";
+
+// const router = express.Router();
+
+// /**
+//  * 1️⃣ Generate presigned URL
+//  */
+// router.post("/presign", async (req, res) => {
+//   try {
+//     const { orderId, fileName, fileType } = req.body;
+
+//     if (!fileName || !fileType) {
+//       return res.status(400).json({
+//         error: "fileName and fileType are required",
+//       });
+//     }
+
+//     const safeOrderId = orderId || randomUUID();
+//     const key = `raw/${safeOrderId}/${Date.now()}-${fileName}`;
+
+//     const command = new PutObjectCommand({
+//       Bucket: process.env.AWS_S3_BUCKET,
+//       Key: key,
+//       ContentType: fileType,
+//     });
+
+//     const uploadUrl = await getSignedUrl(s3, command, {
+//       expiresIn: 60 * 10,
+//     });
+
+//     return res.json({
+//       uploadUrl,
+//       key,
+//       orderId: safeOrderId,
+//     });
+//   } catch (err) {
+//     console.error("PRESIGN ERROR:", err);
+//     return res.status(500).json({
+//       error: "Failed to generate upload URL",
+//     });
+//   }
+// });
+
+// #-----------------------------------------------
+
 import express from "express";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { randomUUID } from "crypto";
 import s3 from "../s3.js";
-import pool from "../db.js";
 
 const router = express.Router();
 
 /**
  * 1️⃣ Generate presigned URL
+ * Supports:
+ * - raw uploads (client)
+ * - final uploads (admin)
  */
+// router.post("/presign", async (req, res) => {
+  
+//   try {
+//     const { orderId, fileName, fileType, uploadType } = req.body;
+
+//     if (!fileName || !fileType) {
+//       return res.status(400).json({
+//         error: "fileName and fileType are required",
+//       });
+//     }
+
+//     const safeOrderId = orderId || randomUUID();
+
+//     // ✅ Decide folder
+//     const folder = uploadType === "final" ? "final" : "raw";
+
+//     const key = `${folder}/${safeOrderId}/${Date.now()}-${fileName}`;
+
+//     const command = new PutObjectCommand({
+//       Bucket: process.env.AWS_S3_BUCKET,
+//       Key: key,
+//       ContentType: fileType,
+//     });
+
+//     const uploadUrl = await getSignedUrl(s3, command, {
+//       expiresIn: 60 * 10,
+//     });
+
+//     return res.json({
+//       uploadUrl,
+//       key,
+//       orderId: safeOrderId,
+//     });
+//   } catch (err) {
+//     console.error("PRESIGN ERROR:", err);
+//     return res.status(500).json({
+//       error: "Failed to generate upload URL",
+//     });
+//   }
+// });
+
 router.post("/presign", async (req, res) => {
   try {
-    const { orderId, fileName, fileType } = req.body;
+    const { orderId, fileName, fileType, uploadType } = req.body;
 
     if (!fileName || !fileType) {
       return res.status(400).json({
@@ -20,8 +113,17 @@ router.post("/presign", async (req, res) => {
       });
     }
 
+    // 🔐 SAFETY GUARD — PASTE HERE
+    if (uploadType === "final" && !orderId) {
+      return res.status(400).json({
+        error: "Final uploads require a valid orderId",
+      });
+    }
+
     const safeOrderId = orderId || randomUUID();
-    const key = `raw/${safeOrderId}/${Date.now()}-${fileName}`;
+
+    const folder = uploadType === "final" ? "final" : "raw";
+    const key = `${folder}/${safeOrderId}/${Date.now()}-${fileName}`;
 
     const command = new PutObjectCommand({
       Bucket: process.env.AWS_S3_BUCKET,
@@ -45,6 +147,7 @@ router.post("/presign", async (req, res) => {
     });
   }
 });
+
 
 /**
  * 2️⃣ Save uploaded files info to DB (MULTI-FILE)

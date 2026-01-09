@@ -89,12 +89,7 @@ export default function OurWorks() {
         >
           Our Works
         </h2>
-        <p 
-        // ref={revealRef} 
-        className="reveal-on-scroll font-bold text-charcoal text-center mb-12 text-gray-600 mb-16 text-lg"
-        // style={{ animationDelay: "0.15s" }}
-        >
-          memories we&apos;ve crafted
+        <p className="font-bold text-charcoal text-center mb-12 text-gray-600 mb-16 text-lg"> memories we've crafted
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">

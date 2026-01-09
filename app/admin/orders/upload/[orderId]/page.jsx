@@ -244,6 +244,7 @@ export default function AdminUploadPage() {
             orderId,
             fileName: file.name,
             fileType: file.type,
+            uploadType: "final", // 🔥 THIS LINE FIXES IT
           }),
         }
       );

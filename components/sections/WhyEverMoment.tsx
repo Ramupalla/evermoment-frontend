@@ -6,9 +6,10 @@ export default function WhyEverMoment() {
   const revealRef = useScrollReveal();
   const features = [
     {
-      title: 'Made for real memories',
-      description: 'Birthdays, anniversaries, travel, family moments — the moments that matter to you.',
-      icon: '🎉'
+      title: "Made for real memories",
+      description: "From everyday joys to once-in-a-lifetime moments, we craft memories that last forever.",
+      icon: "🎉"
+
     },
     {
       title: 'No editing skills needed',

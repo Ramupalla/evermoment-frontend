@@ -308,6 +308,8 @@ import s3 from "../s3.js";
 import { sendEmail } from "../utils/sendEmail.js";
 
 import { sendOrderConfirmationEmail } from "../utils/sendOrderConfirmationEmail.js";
+import { sendAdminNewOrderEmail } from "../utils/sendAdminNewOrderEmail.js";
+
 
 const router = express.Router();
 
@@ -322,11 +324,28 @@ const PLAN_PRICING = {
   premium: 799,
 };
 
+
 const FAST_TRACK_PRICE = 99;
+
+const OFFERS_ENABLED = true;
+
+const OFFER_DISCOUNT_PERCENT = 50; // Flat 50% OFF
+
 
 /* =========================
    HELPERS
 ========================= */
+function applyOffer(amount) {
+  if (!OFFERS_ENABLED) return amount;
+
+  const discounted = Math.round(amount * (1 - OFFER_DISCOUNT_PERCENT / 100));
+
+  // Prevent ₹0 edge case
+  return Math.max(discounted, 1);
+}
+
+
+
 function extractS3Key(deliveryUrl) {
   if (!deliveryUrl) return null;
   return deliveryUrl.replace(/^s3:\/\/[^/]+\//, "");
@@ -369,52 +388,147 @@ router.post("/", async (req, res) => {
     const safeFastTrack =
       FAST_TRACK_ENABLED && plan === "story" && fastTrack === true;
 
-    const baseAmount = PLAN_PRICING[plan];
-    const fastTrackAmount = safeFastTrack ? FAST_TRACK_PRICE : 0;
-    const amount = baseAmount + fastTrackAmount;
+//     // const baseAmount = PLAN_PRICING[plan];
+//     // const fastTrackAmount = safeFastTrack ? FAST_TRACK_PRICE : 0;
+//     // const amount = baseAmount + fastTrackAmount;
+
+// const originalBaseAmount = PLAN_PRICING[plan];
+// const fastTrackAmount = safeFastTrack ? FAST_TRACK_PRICE : 0;
+
+// // 🎁 Apply offer only on base plan
+// const discountedBaseAmount = applyOffer(originalBaseAmount);
+
+// // Final payable amount
+// const amount = discountedBaseAmount + fastTrackAmount;
+
+const originalBaseAmount = PLAN_PRICING[plan];
+const fastTrackAmount = safeFastTrack ? FAST_TRACK_PRICE : 0;
+
+// 🎁 Apply offer only on base plan
+const discountedBaseAmount = applyOffer(originalBaseAmount);
+
+// Final payable amount
+const amount = discountedBaseAmount + fastTrackAmount;
+
+
 
     const orderId = randomUUID();
     const accessToken = randomBytes(32).toString("hex");
 
     /* ---- Insert order ---- */
+    // await pool.query(
+    //   `
+    //   INSERT INTO orders
+    //   (
+    //     id,
+    //     email,
+    //     whatsapp,
+    //     moment_type,
+    //     special_because,
+    //     plan,
+    //     fast_track,
+    //     base_amount,
+    //     fast_track_amount,
+    //     amount,
+    //     access_token
+    //   )
+    //   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    //   `,
+    //   [
+    //     orderId,
+    //     email,
+    //     whatsapp,
+    //     momentType,
+    //     specialBecause || null,
+    //     plan,
+    //     safeFastTrack ? 1 : 0,
+    //     baseAmount,
+    //     fastTrackAmount,
+    //     amount,
+    //     accessToken,
+    //   ]
+    // );
+
     await pool.query(
-      `
-      INSERT INTO orders
-      (
-        id, email, whatsapp, moment_type, special_because, plan,
-        fast_track, base_amount, fast_track_amount,
-        amount, access_token
-      )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `,
-      [
-        orderId,
-        email,
-        whatsapp,
-        momentType,
-        specialBecause || null,
-        plan,
-        safeFastTrack ? 1 : 0,
-        baseAmount,
-        fastTrackAmount,
-        amount,
-        accessToken,
-      ]
-    );
+  `
+  INSERT INTO orders
+  (
+    id, email, whatsapp, moment_type, special_because, plan,
+    fast_track,
+    original_base_amount,
+    discounted_base_amount,
+    base_amount,
+    fast_track_amount,
+    amount,
+    access_token
+  )
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `,
+  [
+    orderId,
+    email,
+    whatsapp,
+    momentType,
+    specialBecause || null,
+    plan,
+    safeFastTrack ? 1 : 0,
+
+    originalBaseAmount,     // ✅ 149 / 399 / 799
+    discountedBaseAmount,   // ✅ 79 / 199 / 399
+
+    discountedBaseAmount,   // base_amount = payable base
+    fastTrackAmount,
+    amount,
+    accessToken,
+  ]
+);
+
 
     /* ---- Send confirmation email (non-blocking) ---- */
     try {
-      await sendOrderConfirmationEmail({
-        email,
+    await sendAdminNewOrderEmail({
         orderId,
         plan,
-        fastTrack: safeFastTrack,
-        base_amount: baseAmount,
-        fast_track_amount: fastTrackAmount,
+        amount,
+        fastTrack,
+        email,
+        whatsapp,
+        createdAt: new Date(),
       });
-    } catch (err) {
-      console.error("ORDER CONFIRMATION EMAIL FAILED:", err);
+      } catch (err) {
+    console.error("Admin email failed:", err);
     }
+
+// Client notification
+    // try {
+    //   await sendOrderConfirmationEmail({
+    //     email,
+    //     orderId,
+    //     plan,
+    //     fastTrack: safeFastTrack,
+    //     base_amount: baseAmount,
+    //     fast_track_amount: fastTrackAmount,
+    //   });
+    // } catch (err) {
+    //   console.error("ORDER CONFIRMATION EMAIL FAILED:", err);
+    // }
+
+    // Client notification
+try {
+  await sendOrderConfirmationEmail({
+    email,
+    orderId,
+    access_token: accessToken, // 🔥 REQUIRED FIX
+    plan,
+    fastTrack: safeFastTrack,
+    // base_amount: baseAmount,
+    base_amount: discountedBaseAmount,
+    fast_track_amount: fastTrackAmount,
+  });
+} catch (err) {
+  console.error("ORDER CONFIRMATION EMAIL FAILED:", err);
+}
+
 
     return res.status(201).json({
       orderId,
