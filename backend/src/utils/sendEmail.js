@@ -84,6 +84,50 @@
 //   }
 // }
 
+// -------------------------------------------------------------------
+
+// import { Resend } from "resend";
+
+// /* =========================
+//    RESEND CLIENT
+// ========================= */
+// const resend = new Resend(process.env.RESEND_API_KEY);
+
+// /* =========================
+//    SEND EMAIL (NON-BLOCKING)
+// ========================= */
+// export async function sendEmail({ to, subject, html }) {
+//   console.log("📨 sendEmail() CALLED");
+//   console.log({ to, subject });
+
+//   try {
+//     const result = await resend.emails.send({
+//       from: process.env.EMAIL_FROM || "EverMoment <no-reply@evermomentstudio.online>",
+//       to,
+//       subject,
+//       html,
+//     });
+
+//     // console.log("✅ EMAIL SENT:", result.id);
+//     console.log("✅ EMAIL SENT:", result?.id || result?.data?.id || "OK");
+
+
+//     return {
+//       success: true,
+//       id: result.id,
+//     };
+//   } catch (err) {
+//     console.error("❌ EMAIL SEND FAILED (NON-BLOCKING):", err?.message || err);
+
+//     // 🔥 IMPORTANT: DO NOT THROW
+//     return {
+//       success: false,
+//       error: err?.message || "Email failed",
+//     };
+//   }
+// }
+
+// -----------------------------------------------------------------------
 
 import { Resend } from "resend";
 
@@ -101,28 +145,38 @@ export async function sendEmail({ to, subject, html }) {
 
   try {
     const result = await resend.emails.send({
-      from: process.env.EMAIL_FROM || "EverMoment <no-reply@evermomentstudio.online>",
+      from:
+        process.env.EMAIL_FROM ||
+        "EverMoment <no-reply@evermomentstudio.online>",
       to,
       subject,
       html,
     });
 
-    // console.log("✅ EMAIL SENT:", result.id);
-    console.log("✅ EMAIL SENT:", result?.id || result?.data?.id || "OK");
+    /* 🔎 CRITICAL CHECK */
+    if (result.error) {
+      console.error("❌ RESEND ERROR:", result.error);
+      return {
+        success: false,
+        error: result.error.message,
+      };
+    }
 
+    console.log("✅ EMAIL QUEUED IN RESEND:", result.data.id);
 
     return {
       success: true,
-      id: result.id,
+      id: result.data.id,
     };
   } catch (err) {
-    console.error("❌ EMAIL SEND FAILED (NON-BLOCKING):", err?.message || err);
+    console.error(
+      "❌ EMAIL SEND FAILED (EXCEPTION):",
+      err?.message || err
+    );
 
-    // 🔥 IMPORTANT: DO NOT THROW
     return {
       success: false,
       error: err?.message || "Email failed",
     };
   }
 }
-
